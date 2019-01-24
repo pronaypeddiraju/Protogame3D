@@ -12,6 +12,7 @@
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystems.hpp"
+#include "Engine/Core/Time.hpp"
 
 //Create Camera and set to null 
 Camera *g_mainCamera = nullptr; 
@@ -139,25 +140,39 @@ void Game::HandleKeyReleased(unsigned char keyCode)
 
 void Game::Render() const
 {
-	g_renderContext->ClearScreen(*g_clearScreenColor);
+	g_renderContext->BeginFrame();
 
 	g_renderContext->BeginCamera(*g_mainCamera);
 
 	g_renderContext->BindTexture(nullptr);
-	DebugRender();
 
+	//Lerp the screen color here
+	float time = GetCurrentTimeSeconds();
+	float lerpValue = (sin(time) + 1.0f) * 0.5f;
+
+	g_clearScreenColor->b = lerpValue;
+
+
+	//DebugRender();
+	/*
 	if(!m_consoleDebugOnce)
 	{
-		EventArgs* args = new EventArgs("TestString", "This is a test");
-		g_devConsole->Command_Test(*args);
-		g_devConsole->ExecuteCommandLine("Exec Health=25");
-		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
+	EventArgs* args = new EventArgs("TestString", "This is a test");
+	g_devConsole->Command_Test(*args);
+	g_devConsole->ExecuteCommandLine("Exec Health=25");
+	g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
 
 	g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
+	*/
+
+	g_renderContext->ClearScreen(*g_clearScreenColor);
+
 	g_renderContext->BindTexture(nullptr);
 
 	g_renderContext->EndCamera(*g_mainCamera);
+
+	g_renderContext->EndFrame();
 
 }
 
