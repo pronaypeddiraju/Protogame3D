@@ -65,8 +65,7 @@ void App::StartUp()
 	//Create event system
 	g_eventSystem = new EventSystems();
 
-	//Create the Render Context
-	g_renderContext = new RenderContext();
+	//Call RC Startup 	
 	g_renderContext->Startup();
 	
 	//Create the Input System

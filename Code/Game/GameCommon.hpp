@@ -39,6 +39,8 @@ constexpr float MAX_SHAKE = 2.0f;
 
 constexpr float DEVCONSOLE_LINE_HEIGHT = 2.0f;
 
+constexpr float CLIENT_ASPECT = 2.0f; // We are requesting a 1:1 aspect (square) window area
+
 class RenderContext;
 class InputSystem;
 class AudioSystem;
