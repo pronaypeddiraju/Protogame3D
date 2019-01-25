@@ -298,7 +298,7 @@ void CreateD3D11Window(HINSTANCE applicationInstanceHandle, float clientAspect)
 
 void CreateRenderContext() 
 {
-	g_renderContext = new RenderContext( g_hWnd );
+	g_renderContext = new RenderContext( (void*)g_hWnd );
 }
 
 //-----------------------------------------------------------------------------------------------

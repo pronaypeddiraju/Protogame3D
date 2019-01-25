@@ -30,6 +30,7 @@ Game::Game()
 	m_isGameAlive = true;
 	m_testAudioID = g_audio->CreateOrGetSound("Data/Audio/UproarLilWayne.mp3");
 
+	/*
 	m_textureTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png");
 	m_testImage = new Image("Data/Images/Test_StbiFlippedAndOpenGL.png");
 	m_spriteTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_SpriteSheet8x2.png");
@@ -42,6 +43,7 @@ Game::Game()
 	m_explosionLoop = new SpriteAnimDefenition(*explosionSheet, 0, 24, 0.5f, SPRITE_ANIM_PLAYBACK_LOOP);
 
 	g_devConsole->SetBitmapFont(*m_squirrelFont);
+	*/
 }
 
 Game::~Game()
@@ -144,7 +146,7 @@ void Game::Render() const
 
 	g_renderContext->BeginCamera(*g_mainCamera);
 
-	g_renderContext->BindTexture(nullptr);
+	//g_renderContext->BindTexture(nullptr);
 
 	//Lerp the screen color here
 	float time = GetCurrentTimeSeconds();
@@ -168,7 +170,7 @@ void Game::Render() const
 
 	g_renderContext->ClearScreen(*g_clearScreenColor);
 
-	g_renderContext->BindTexture(nullptr);
+	//g_renderContext->BindTexture(nullptr);
 
 	g_renderContext->EndCamera(*g_mainCamera);
 
