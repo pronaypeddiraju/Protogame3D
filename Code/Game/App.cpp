@@ -22,7 +22,7 @@ App::App()
 
 App::~App()
 {
-	//De constructor method
+	ShutDown();
 }
 
 STATIC bool App::Command_Quit(EventArgs& args)
@@ -90,9 +90,6 @@ void App::StartUp()
 
 void App::ShutDown()
 {
-	delete g_theApp;			
-	g_theApp = nullptr;
-
 	delete g_renderContext;
 	g_renderContext = nullptr;
 

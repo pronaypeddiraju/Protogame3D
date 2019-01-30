@@ -62,6 +62,9 @@ void Game::StartUp()
 	g_devConsole->PrintString(Rgba::WHITE, "Last thing I printed");
 
 	g_eventSystem->SubscribeEventCallBackFn("TestEvent", TestEvent);
+
+	//Get the Shader
+	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_defaultShaderPath);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -142,39 +145,31 @@ void Game::HandleKeyReleased(unsigned char keyCode)
 
 void Game::Render() const
 {
-	g_renderContext->BeginFrame();
+	
+	//Get the ColorTargetView from rendercontext
+	ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 
-	g_renderContext->BeginCamera(*g_mainCamera);
+	//Setup what we are rendering to
+	g_mainCamera->SetColorTarget(colorTargetView);
 
-	//g_renderContext->BindTexture(nullptr);
+	//here we can also setup how big we want our target view to be
+	g_mainCamera->SetOrthoView(Vec2(0.f,0.f), Vec2(200.f,100.f));
 
-	//Lerp the screen color here
-	float time = GetCurrentTimeSeconds();
-	float lerpValue = (sin(time) + 1.0f) * 0.5f;
+	// start rendering
+	g_renderContext->BeginCamera(*g_mainCamera); 
 
-	g_clearScreenColor->b = lerpValue;
+	//Clear the screen
+	g_renderContext->ClearColorTargets(Rgba::BLUE);
 
+	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
+	g_renderContext->BindShader( m_shader );
 
-	//DebugRender();
-	/*
-	if(!m_consoleDebugOnce)
-	{
-	EventArgs* args = new EventArgs("TestString", "This is a test");
-	g_devConsole->Command_Test(*args);
-	g_devConsole->ExecuteCommandLine("Exec Health=25");
-	g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
-	}
+	//Tell the GPU to now draw something
+	g_renderContext->Draw( 3, 0);			//This 3,0 is bullshit that Forseth did, you will understand what's up and change this later
 
-	g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
-	*/
+	//End your camera
+	g_renderContext->EndCamera();
 
-	g_renderContext->ClearScreen(*g_clearScreenColor);
-
-	//g_renderContext->BindTexture(nullptr);
-
-	g_renderContext->EndCamera(*g_mainCamera);
-
-	g_renderContext->EndFrame();
 
 }
 

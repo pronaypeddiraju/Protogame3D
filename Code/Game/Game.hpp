@@ -7,6 +7,7 @@ class Texture;
 class BitmapFont;
 class SpriteAnimDefenition;
 class Image;
+class Shader;
 
 class Game
 {
@@ -51,4 +52,9 @@ public:
 	Texture* m_explosionTexture = nullptr;
 	Image* m_testImage = nullptr;
 	float m_animTime = 0.f;
+
+	//D3D11 stuff
+	Shader*	m_shader = nullptr;
+	std::string m_defaultShaderPath = "Data/Shaders/DefaultShader.hlsl";
+
 };

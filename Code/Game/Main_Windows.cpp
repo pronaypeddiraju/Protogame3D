@@ -345,7 +345,7 @@ void Startup( HINSTANCE applicationInstanceHandle )
 void Shutdown()
 {
 	// Destroy the global App instance
-	g_theApp->ShutDown();
+	delete g_theApp;
 	g_theApp = nullptr;
 }
 
@@ -361,7 +361,7 @@ int WINAPI WinMain( HINSTANCE applicationInstanceHandle, HINSTANCE, LPSTR comman
 	{
 		RunMessagePump();
 		g_theApp->RunFrame();
-		SwapBuffers(g_displayDeviceContext);
+		//SwapBuffers(g_displayDeviceContext);
 		Sleep(0);
 	}
 
