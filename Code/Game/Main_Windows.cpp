@@ -296,11 +296,6 @@ void CreateD3D11Window(HINSTANCE applicationInstanceHandle, float clientAspect)
 	SetCursor( cursor );
 }
 
-void CreateRenderContext() 
-{
-	g_renderContext = new RenderContext( (void*)g_hWnd );
-}
-
 //-----------------------------------------------------------------------------------------------
 // Processes all Windows messages (WM_xxx) for this app that have queued up since last frame.
 // For each message in the queue, our WindowsMessageHandlingProcedure (or "WinProc") function
@@ -327,17 +322,15 @@ void RunMessagePump()
 //-----------------------------------------------------------------------------------------------
 void Startup( HINSTANCE applicationInstanceHandle )
 {
-	g_theApp = new App();	
-	
 	//We create app first and read black board. Then we create window and we get the window data based on black board info to create either full screen/ windowed screen
 	//CreateOpenGLWindow( applicationInstanceHandle, CLIENT_ASPECT );
-	
-	//Here call a CreateWindow and CreateRenderContext
-	CreateD3D11Window(applicationInstanceHandle, CLIENT_ASPECT);
-	CreateRenderContext();
 
+	//Here call a CreateWindow 
+	CreateD3D11Window(applicationInstanceHandle, CLIENT_ASPECT);
+
+	//Create the app and pass it the window handle
+	g_theApp = new App(g_hWnd);	
 	g_theApp->StartUp();
-	printf("Executed Main_Startup");
 }
 
 

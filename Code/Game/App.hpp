@@ -1,5 +1,6 @@
 //  [8/23/2018 Pronay Peddiraju]
 #pragma once
+
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Commons/EngineCommon.hpp"
 
@@ -10,7 +11,7 @@ class App
 public:
 	//Public methods
 
-	App();
+	App(void* hwndReference);
 	~App();
 	
 	static bool Command_Quit(EventArgs& args);
@@ -42,13 +43,16 @@ public:
 
 private:
 	//private variable
-	bool m_isQuitting = false;
-	bool m_isPaused = false;
-	bool m_isSlowMo = false;
+	bool		m_isQuitting = false;
+	bool		m_isPaused = false;
+	bool		m_isSlowMo = false;
 
-	Game* m_game = nullptr;
+	Game*		m_game = nullptr;
 	
-	double m_timeAtLastFrameBegin = 0;
-	double m_timeAtThisFrameBegin = 0;
+	//Reference to the window handle as void*
+	void*		m_appWindowHandle = nullptr;
+
+	double		m_timeAtLastFrameBegin = 0;
+	double		m_timeAtThisFrameBegin = 0;
 
 };

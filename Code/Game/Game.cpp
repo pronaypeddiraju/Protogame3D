@@ -15,13 +15,13 @@
 #include "Engine/Core/Time.hpp"
 
 //Create Camera and set to null 
-Camera *g_mainCamera = nullptr; 
+Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
 float g_shakeAmount = 0.0f;
 //ScreenColor
 Rgba* g_clearScreenColor = nullptr;
 
 RandomNumberGenerator* g_randomNumGen;
-extern RenderContext* g_renderContext;
+extern RenderContext* g_renderContext;	// Declare these first
 extern AudioSystem* g_audio;
 bool g_debugMode = false;
 
@@ -78,46 +78,60 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 {
 	switch( keyCode )
 	{
-	case UP_ARROW:
-	case RIGHT_ARROW:
-	case LEFT_ARROW:
-	case SPACE_KEY:
-	case A_KEY:
-	case N_KEY:
-	break;
-	case F1_KEY:
-	//m_testPlayback = g_audio->PlaySound(m_testAudioID);
-	break;
-	case F2_KEY:
-	//Set playback speed to 0
-	//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 0.0f);
-	break;
-	case F3_KEY:
-	//Set playback speed back to 1
-	//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 1.0f);
-	break;
-	case F4_KEY:
-	//Set volume back to 1
-	//g_audio->SetSoundPlaybackVolume(m_testPlayback, 1.0f);
-	//Unsub test
-	g_eventSystem->UnsubscribeEventCallBackFn("TestEvent", TestEvent);
-	break;
-	case F5_KEY:
-	//Set volume to 0
-	//g_audio->SetSoundPlaybackVolume(m_testPlayback, 0.0f);
-	//Help Debug
-	g_eventSystem->FireEvent("Help");
-	break;
-	case F6_KEY:
-	//Fire event
-	g_eventSystem->FireEvent("TestEvent");
-	break;
-	case F7_KEY:
-	//Quit Debug
-	g_eventSystem->FireEvent("Quit");
-	break;
-	default:
-	break;
+		case UP_ARROW:
+		case RIGHT_ARROW:
+		case LEFT_ARROW:
+		case SPACE_KEY:
+		case A_KEY:
+		case N_KEY:
+		break;
+		case F1_KEY:
+		{
+			//m_testPlayback = g_audio->PlaySound(m_testAudioID);
+			break;
+		}
+		case F2_KEY:
+		{
+			//Set playback speed to 0
+			//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 0.0f);
+			break;
+		}
+		case F3_KEY:
+		{
+			//Set playback speed back to 1
+			//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 1.0f);
+			break;
+		}
+		case F4_KEY:
+		{
+			//Set volume back to 1
+			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 1.0f);
+			//Unsub test
+			g_eventSystem->UnsubscribeEventCallBackFn("TestEvent", TestEvent);
+			break;
+		}
+		case F5_KEY:
+		{
+			//Set volume to 0
+			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 0.0f);
+			//Help Debug
+			g_eventSystem->FireEvent("Help");
+			break;
+		}
+		case F6_KEY:
+		{
+			//Fire event
+			g_eventSystem->FireEvent("TestEvent");
+			break;
+		}
+		case F7_KEY:
+		{
+			//Quit Debug
+			g_eventSystem->FireEvent("Quit");
+			break;
+		}
+		default:
+		break;
 	}
 }
 
@@ -133,19 +147,18 @@ void Game::HandleKeyReleased(unsigned char keyCode)
 	//SoundID testSound = g_audio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
 	switch( keyCode )
 	{
-	case UP_ARROW:
-	case RIGHT_ARROW:
-	case LEFT_ARROW:
-	//g_audio->PlaySound( m_testAudioID );
-	break;
-	default:
-	break;
+		case UP_ARROW:
+		case RIGHT_ARROW:
+		case LEFT_ARROW:
+		//g_audio->PlaySound( m_testAudioID );
+		break;
+		default:
+		break;
 	}
 }
 
 void Game::Render() const
 {
-	
 	//Get the ColorTargetView from rendercontext
 	ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 
@@ -169,8 +182,6 @@ void Game::Render() const
 
 	//End your camera
 	g_renderContext->EndCamera();
-
-
 }
 
 void Game::PostRender()
@@ -349,7 +360,6 @@ void Game::DebugRender() const
 	g_renderContext->BindTexture(nullptr);
 }
 
-//Calls the UpdateShip function in playerShip
 void Game::Update( float deltaTime )
 {
 	UpdateCamera(deltaTime);
@@ -388,12 +398,8 @@ void Game::UpdateCamera(float deltaTime)
 	g_mainCamera->Translate2D(translate2D);
 }
 
-
-
 void Game::ClearGarbageEntities()
 {
-
-	
 }
 
 void Game::CheckXboxInputs()
@@ -402,8 +408,7 @@ void Game::CheckXboxInputs()
 }
 
 void Game::CheckCollisions()
-{	
-	
+{		
 }
 
 bool Game::IsAlive()
