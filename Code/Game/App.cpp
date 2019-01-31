@@ -231,7 +231,7 @@ bool App::HandleKeyReleased(unsigned char keyCode)
 			return true;
 		}
 		default:
-		break;
+		return false;
 	}
 }
 
