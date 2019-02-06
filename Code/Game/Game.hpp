@@ -55,6 +55,6 @@ public:
 
 	//D3D11 stuff
 	Shader*	m_shader = nullptr;
-	std::string m_defaultShaderPath = "Data/Shaders/DefaultShader.hlsl";
+	std::string m_defaultShaderPath = "DefaultShader.hlsl";
 
 };

@@ -182,16 +182,17 @@ void Game::Render() const
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );
 
+	/*
 	//A2 implementation (using a add verts for quad)
 	std::vector<Vertex_PCU>  someBox;
 	AddVertsForAABB2D(someBox, AABB2(Vec2(10.f,10.f), Vec2(30.f, 30.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
-
-	/* 
-	A1 implementation
+	*/
+	
+	//A1 implementation
 	//Tell the GPU to now draw something
 	g_renderContext->Draw( 3, 0);			//This 3,0 is bullshit that Forseth did, you will understand what's up and change this later
-	*/
+	
 
 	//End your camera
 	g_renderContext->EndCamera();
