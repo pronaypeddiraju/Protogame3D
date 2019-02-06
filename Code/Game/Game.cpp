@@ -54,8 +54,13 @@ Game::~Game()
 void Game::StartUp()
 {
 	//Create the Camera and setOrthoView
+	g_mainCamera = new Camera();
+	g_mainCamera->SetColorTarget(nullptr);
+
+	g_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
+
 	g_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
-	
+
 	g_devConsole->PrintString(Rgba::BLUE, "this is a test string");
 	g_devConsole->PrintString(Rgba::RED, "this is also a test string");
 	g_devConsole->PrintString(Rgba::GREEN, "damn this dev console lit!");
@@ -166,7 +171,7 @@ void Game::Render() const
 	g_mainCamera->SetColorTarget(colorTargetView);
 
 	//here we can also setup how big we want our target view to be
-	g_mainCamera->SetOrthoView(Vec2(0.f,0.f), Vec2(200.f,100.f));
+	g_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(SCREEN_ASPECT * 100.f,100.f));
 
 	// start rendering
 	g_renderContext->BeginCamera(*g_mainCamera); 
@@ -177,8 +182,16 @@ void Game::Render() const
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );
 
+	//A2 implementation (using a add verts for quad)
+	std::vector<Vertex_PCU>  someBox;
+	AddVertsForAABB2D(someBox, AABB2(Vec2(10.f,10.f), Vec2(30.f, 30.f)), Rgba::WHITE);
+	g_renderContext->DrawVertexArray(someBox);
+
+	/* 
+	A1 implementation
 	//Tell the GPU to now draw something
 	g_renderContext->Draw( 3, 0);			//This 3,0 is bullshit that Forseth did, you will understand what's up and change this later
+	*/
 
 	//End your camera
 	g_renderContext->EndCamera();
@@ -362,7 +375,7 @@ void Game::DebugRender() const
 
 void Game::Update( float deltaTime )
 {
-	UpdateCamera(deltaTime);
+	//UpdateCamera(deltaTime);
 
 	CheckXboxInputs();
 	m_animTime += deltaTime;
