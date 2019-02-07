@@ -13,7 +13,7 @@
 // The semantic and internal names can be whatever you want, 
 // but know that semantics starting with SV_* usually denote special 
 // inputs/outputs, so probably best to avoid that naming.
-struct vs_input_t 
+struct VertexShaderInputT 
 {
    // we are not defining our own input data; 
    float3 position      : POSITION; 
@@ -35,10 +35,18 @@ struct vs_input_t
 // register(b2) determines the buffer unit to use.  In this case
 // we'll say this data is coming from buffer slot 2. 
 //--------------------------------------------------------------------------------------
-cbuffer camera_constants : register(b2)
+cbuffer CameraConstants : register(b2)
 {
    float2 ORTHO_MIN; 
    float2 ORTHO_MAX; 
+};
+
+cbuffer FrameData : register(b1)
+{
+	float	FRAME_NUMBER;
+	float	CURRENT_TIME;
+	float	COSINE;
+	float	SINE;
 };
 
 //--------------------------------------------------------------------------------------
@@ -47,7 +55,7 @@ cbuffer camera_constants : register(b2)
 
 //--------------------------------------------------------------------------------------
 // for passing data from vertex to fragment (v-2-f)
-struct v2f_t 
+struct VertexToShaderT
 {
    float4 position : SV_POSITION; 
    float4 color : COLOR; 
@@ -62,12 +70,12 @@ float RangeMap( float v, float inMin, float inMax, float outMin, float outMax )
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
-v2f_t VertexFunction( vs_input_t input )
+VertexToShaderT VertexFunction( VertexShaderInputT input )
 {
-   v2f_t v2f = (v2f_t)0;
+	VertexToShaderT v2f = (VertexToShaderT)0;
 
    // can no grab it from the input stream; 
-   float4 inPos = float4(input.position.x, input.position.y, input.position.z, 1); 
+   float4 inPos = float4(input.position.x + COSINE, input.position.y + SINE, input.position.z, 1); 
     
    float clip_x = RangeMap( inPos.x, ORTHO_MIN.x, ORTHO_MAX.x, -1, 1 ); 
    float clip_y = RangeMap( inPos.y, ORTHO_MIN.y, ORTHO_MAX.y, -1, 1 ); 
@@ -92,7 +100,7 @@ v2f_t VertexFunction( vs_input_t input )
 // 
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
-float4 FragmentFunction( v2f_t input ) : SV_Target0
+float4 FragmentFunction( VertexToShaderT input ) : SV_Target0
 {
    // we'll outoupt our UV coordinates as color here
    // to make sure they're being passed correctly.

@@ -376,6 +376,7 @@ void Game::DebugRender() const
 void Game::Update( float deltaTime )
 {
 	//UpdateCamera(deltaTime);
+	g_renderContext->m_frameCount++;
 
 	CheckXboxInputs();
 	m_animTime += deltaTime;
