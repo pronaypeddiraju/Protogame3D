@@ -177,16 +177,16 @@ void Game::Render() const
 	g_renderContext->BeginCamera(*g_mainCamera); 
 
 	//Clear the screen
-	g_renderContext->ClearColorTargets(Rgba::BLUE);
+	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );
 
 	//A2 implementation (using a add verts for quad)
 	std::vector<Vertex_PCU>  someBox;
-	AddVertsForAABB2D(someBox, AABB2(Vec2(10.f,10.f), Vec2(30.f, 30.f)), Rgba::WHITE);
+	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
-	
+
 	/*
 	//A1 implementation
 	//Tell the GPU to now draw something
@@ -417,7 +417,7 @@ void Game::ClearGarbageEntities()
 
 void Game::CheckXboxInputs()
 {
-	XboxController playerController = g_inputSystem->GetXboxController(0);
+	//XboxController playerController = g_inputSystem->GetXboxController(0);
 }
 
 void Game::CheckCollisions()
