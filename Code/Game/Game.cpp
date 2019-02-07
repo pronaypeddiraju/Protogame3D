@@ -182,8 +182,13 @@ void Game::Render() const
 	// start rendering
 	g_renderContext->BeginCamera(*g_mainCamera); 
 
+	//Get the sin of time to set screen color
+	Rgba screenBackground = Rgba::BLACK;
+	float sinTime = (sin(static_cast<float>(GetCurrentTimeSeconds()))  + 1.0f) * 0.5f;
+	screenBackground.b = sinTime;
+	
 	//Clear the screen
-	g_renderContext->ClearColorTargets(Rgba::BLACK);
+	g_renderContext->ClearColorTargets(screenBackground);
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );

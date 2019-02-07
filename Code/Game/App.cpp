@@ -70,7 +70,6 @@ void App::StartUp()
 	g_eventSystem = new EventSystems();
 
 	g_renderContext = new RenderContext(m_appWindowHandle);
-	g_renderContext->Startup();
 	
 	g_inputSystem = new InputSystem();
 
