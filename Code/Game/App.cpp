@@ -90,6 +90,8 @@ void App::StartUp()
 
 void App::ShutDown()
 {
+	m_game->Shutdown();
+
 	delete g_renderContext;
 	g_renderContext = nullptr;
 

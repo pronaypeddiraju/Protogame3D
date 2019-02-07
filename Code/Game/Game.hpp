@@ -20,6 +20,7 @@ public:
 	void StartUp();
 	void HandleKeyPressed( unsigned char keyCode );
 	void DebugEnabled();
+	void Shutdown();
 
 	void HandleKeyReleased( unsigned char keyCode );
 	void Render() const;

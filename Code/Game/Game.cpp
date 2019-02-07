@@ -147,6 +147,12 @@ void Game::DebugEnabled()
 }
 
 
+void Game::Shutdown()
+{
+	delete g_mainCamera;
+	g_mainCamera = nullptr;
+}
+
 void Game::HandleKeyReleased(unsigned char keyCode)
 {
 	//SoundID testSound = g_audio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
