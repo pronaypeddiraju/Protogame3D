@@ -49,7 +49,7 @@ cbuffer camera_constants : register(b2)
 // for passing data from vertex to fragment (v-2-f)
 struct v2f_t 
 {
-   float3 position : SV_POSITION; 
+   float4 position : SV_POSITION; 
    float4 color : COLOR; 
    float2 uv : UV; 
 }; 
@@ -57,7 +57,7 @@ struct v2f_t
 //--------------------------------------------------------------------------------------
 float RangeMap( float v, float inMin, float inMax, float outMin, float outMax ) 
 { 
-   ...
+	return ( ( (v - inMin) * (outMax - outMin) / (inMax - inMin) ) + outMin); 
 }
 
 //--------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ v2f_t VertexFunction( vs_input_t input )
    v2f_t v2f = (v2f_t)0;
 
    // can no grab it from the input stream; 
-   vec3 inPos = input.position; 
+   float4 inPos = float4(input.position.x, input.position.y, input.position.z, 1); 
     
    float clip_x = RangeMap( inPos.x, ORTHO_MIN.x, ORTHO_MAX.x, -1, 1 ); 
    float clip_y = RangeMap( inPos.y, ORTHO_MIN.y, ORTHO_MAX.y, -1, 1 ); 
