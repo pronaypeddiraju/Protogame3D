@@ -213,11 +213,11 @@ void Game::PostRender()
 	//Debug bools
 	m_consoleDebugOnce = true;
 }
-
+/*
 void Game::DebugRenderTextures() const
 {
 	//Test to see if textures render
-	g_renderContext->BindTexture(m_textureTest);
+	g_renderContext->BindTextureView(3, m_textureTest);
 	g_renderContext->SetBlendMode(BLEND_MODE_ALPHA);
 	std::vector<Vertex_PCU> boxVerts;
 	boxVerts.push_back(Vertex_PCU(Vec3(0.f,0.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(0.f,0.f)));
@@ -230,7 +230,8 @@ void Game::DebugRenderTextures() const
 	//addVertsForAABB2(boxVerts, box1Bounds, Rgba(1.f,1.f,0.f));
 	g_renderContext->DrawVertexArray(6, &boxVerts[0]);	//boxVerts.size()
 }
-
+*/
+/*
 void Game::DebugRenderSprites() const
 {
 	g_renderContext->BindTexture(m_spriteTest);
@@ -246,7 +247,8 @@ void Game::DebugRenderSprites() const
 	AddVertsForAABB2D(spriteVerts, box, Rgba(1.f, 1.f, 1.f, 1.f), uvAtBottomLeft, uvAtTopRight);
 	g_renderContext->DrawVertexArray(spriteVerts);
 }
-
+*/
+/*
 void Game::DebugRenderSpriteAnims() const
 {
 	//Sprite animation test
@@ -282,7 +284,8 @@ void Game::DebugRenderSpriteAnims() const
 	g_renderContext->DrawVertexArray(animVertsLoop);
 
 }
-
+*/
+/*
 void Game::DebugRenderTextAlignment() const
 {
 	g_renderContext->BindTexture(nullptr);
@@ -383,6 +386,7 @@ void Game::DebugRender() const
  	DebugRenderTextAlignment();
 	g_renderContext->BindTexture(nullptr);
 }
+*/
 
 void Game::Update( float deltaTime )
 {
