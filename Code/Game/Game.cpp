@@ -13,6 +13,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystems.hpp"
 #include "Engine/Core/Time.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 
 //Create Camera and set to null 
 Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
@@ -70,6 +71,9 @@ void Game::StartUp()
 
 	//Get the Shader
 	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_defaultShaderPath);
+
+	//Get the test texture
+	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -192,17 +196,13 @@ void Game::Render() const
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );
+	//Bind the Texture to be used
+	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
 
 	//A2 implementation (using a add verts for quad)
 	std::vector<Vertex_PCU>  someBox;
-	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
+	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE, Vec2(1.0f, 1.0f), Vec2(0.f, 0.f));
 	g_renderContext->DrawVertexArray(someBox);
-
-	/*
-	//A1 implementation
-	//Tell the GPU to now draw something
-	g_renderContext->Draw( 3, 0);			//This 3,0 is bullshit that Forseth did, you will understand what's up and change this later
-	*/
 
 	//End your camera
 	g_renderContext->EndCamera();
