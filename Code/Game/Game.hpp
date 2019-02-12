@@ -57,6 +57,6 @@ public:
 
 	//D3D11 stuff
 	Shader*								m_shader = nullptr;
-	std::string							m_defaultShaderPath = "vbo.hlsl";
+	std::string							m_defaultShaderPath = "default_unlit.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 };

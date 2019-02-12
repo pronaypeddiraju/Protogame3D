@@ -201,7 +201,7 @@ void Game::Render() const
 
 	//A2 implementation (using a add verts for quad)
 	std::vector<Vertex_PCU>  someBox;
-	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE, Vec2(1.0f, 1.0f), Vec2(0.f, 0.f));
+	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
 
 	//End your camera
