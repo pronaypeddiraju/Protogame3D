@@ -14,6 +14,7 @@
 #include "Engine/Core/EventSystems.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 
 //Create Camera and set to null 
 Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
@@ -31,19 +32,19 @@ Game::Game()
 	m_isGameAlive = true;
 	m_testAudioID = g_audio->CreateOrGetSound("Data/Audio/UproarLilWayne.mp3");
 
+	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
+	g_devConsole->SetBitmapFont(*m_squirrelFont);
+
 	/*
 	m_textureTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png");
 	m_testImage = new Image("Data/Images/Test_StbiFlippedAndOpenGL.png");
 	m_spriteTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_SpriteSheet8x2.png");
-	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
 
 	m_explosionTexture = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Explosion_5x5.png");
 	SpriteSheet* explosionSheet = new SpriteSheet(m_explosionTexture, IntVec2(5,5));
 	m_explosionPingPong = new SpriteAnimDefenition(*explosionSheet, 0, 24, 1.f, SPRITE_ANIM_PLAYBACK_PINGPONG);
 	m_explosionOnce = new SpriteAnimDefenition(*explosionSheet, 0, 24, 2.0f, SPRITE_ANIM_PLAYBACK_ONCE);
 	m_explosionLoop = new SpriteAnimDefenition(*explosionSheet, 0, 24, 0.5f, SPRITE_ANIM_PLAYBACK_LOOP);
-
-	g_devConsole->SetBitmapFont(*m_squirrelFont);
 	*/
 }
 
@@ -155,6 +156,17 @@ void Game::Shutdown()
 {
 	delete g_mainCamera;
 	g_mainCamera = nullptr;
+
+	FreeResources();
+}
+
+void Game::FreeResources()
+{
+	delete m_squirrelFont;
+	m_squirrelFont = nullptr;
+
+	delete m_textureTest;
+	m_squirrelFont = nullptr;
 }
 
 void Game::HandleKeyReleased(unsigned char keyCode)
@@ -203,6 +215,17 @@ void Game::Render() const
 	std::vector<Vertex_PCU>  someBox;
 	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
+
+	g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
+	if(!m_consoleDebugOnce)
+	{
+		EventArgs* args = new EventArgs("TestString", "This is a test");
+		g_devConsole->Command_Test(*args);
+		g_devConsole->ExecuteCommandLine("Exec Health=25");
+		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
+	}
+
+	g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
 
 	//End your camera
 	g_renderContext->EndCamera();

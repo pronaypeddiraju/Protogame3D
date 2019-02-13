@@ -94,7 +94,7 @@ VertexToShaderT VertexFunction(VertexShaderInputT input)
 {
 	VertexToShaderT v2f = (VertexToShaderT)0;
 	
-	float4 inPos = float4(input.position.x + COSINE, input.position.y + SINE, input.position.z, 1); 
+	float4 inPos = float4(input.position.x, input.position.y, input.position.z, 1); 
 
 	float clip_x = RangeMap( inPos.x, ORTHO_MIN.x, ORTHO_MAX.x, -1, 1 ); 
 	float clip_y = RangeMap( inPos.y, ORTHO_MIN.y, ORTHO_MAX.y, -1, 1 ); 
