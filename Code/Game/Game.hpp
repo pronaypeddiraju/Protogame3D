@@ -19,11 +19,14 @@ public:
 	static bool TestEvent(EventArgs& args);
 	
 	void								StartUp();
+	
 	void								HandleKeyPressed( unsigned char keyCode );
+	void								HandleKeyReleased( unsigned char keyCode );
+	void								HandleCharacter( unsigned char charCode );
+
 	void								DebugEnabled();
 	void								Shutdown();
 
-	void								HandleKeyReleased( unsigned char keyCode );
 	void								Render() const;
 	void								PostRender();
 	void								Update( float deltaTime );

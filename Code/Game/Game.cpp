@@ -75,6 +75,11 @@ STATIC bool Game::TestEvent(EventArgs& args)
 
 void Game::HandleKeyPressed(unsigned char keyCode)
 {
+	if(g_devConsole->IsOpen())
+	{
+		g_devConsole->HandleKeyDown(keyCode);
+	}
+
 	switch( keyCode )
 	{
 		case UP_ARROW:
@@ -83,24 +88,10 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case SPACE_KEY:
 		case A_KEY:
 		case N_KEY:
-		break;
 		case F1_KEY:
-		{
-			//m_testPlayback = g_audio->PlaySound(m_testAudioID);
-			break;
-		}
 		case F2_KEY:
-		{
-			//Set playback speed to 0
-			//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 0.0f);
-			break;
-		}
 		case F3_KEY:
-		{
-			//Set playback speed back to 1
-			//g_audio->SetSoundPlaybackSpeed(m_testPlayback, 1.0f);
-			break;
-		}
+		break;
 		case F4_KEY:
 		{
 			//Set volume back to 1
@@ -151,6 +142,12 @@ void Game::Shutdown()
 
 void Game::HandleKeyReleased(unsigned char keyCode)
 {
+	if(g_devConsole->IsOpen())
+	{
+		g_devConsole->HandleKeyUp(keyCode);
+		return;
+	}
+
 	//SoundID testSound = g_audio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
 	switch( keyCode )
 	{
@@ -161,6 +158,15 @@ void Game::HandleKeyReleased(unsigned char keyCode)
 		break;
 		default:
 		break;
+	}
+}
+
+void Game::HandleCharacter( unsigned char charCode )
+{
+	if(g_devConsole->IsOpen())
+	{
+		g_devConsole->HandleCharacter(charCode);
+		return;
 	}
 }
 
@@ -185,7 +191,10 @@ void Game::Render() const
 	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
 
-	g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
+	std::vector<Vertex_PCU> someLine;
+	AddVertsForLine2D(someLine, Vec2(20.f, 20.f), Vec2(50.f, 50.f), 2.f, Rgba::WHITE);
+	g_renderContext->DrawVertexArray(someLine);
+
 	if(!m_consoleDebugOnce)
 	{
 		EventArgs* args = new EventArgs("TestString", "This is a test");
@@ -194,8 +203,12 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
 
-	g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
-
+	if(g_devConsole->IsOpen())
+	{
+		g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
+		g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
+	}
+	
 	g_renderContext->EndCamera();
 }
 

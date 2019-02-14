@@ -160,25 +160,16 @@ void App::PostRender()
 
 bool App::HandleKeyPressed(unsigned char keyCode)
 {
+	if(keyCode == TILDY_KEY)
+	{
+		g_devConsole->ToggleOpenFull();
+	}
+
 	switch(keyCode)
 	{
-		case T_KEY:
-		{
-			//Implement code to slow down the ship (deltaTime /= 10)
-			m_isSlowMo = true;
-			return true;
-		}
-		case  P_KEY:
-		{
-			//Implement code to pause game (deltaTime = 0)
-			m_isPaused = !m_isPaused;
-			return true;
-		}
 		case UP_ARROW:
 		case RIGHT_ARROW:
 		case LEFT_ARROW:	
-		case A_KEY:
-		case N_KEY:
 		case F1_KEY:
 		case F2_KEY:
 		case F3_KEY:
@@ -234,6 +225,12 @@ bool App::HandleKeyReleased(unsigned char keyCode)
 		default:
 		return false;
 	}
+}
+
+bool App::HandleCharacter( unsigned char charCode )
+{
+	m_game->HandleCharacter(charCode);
+	return false;
 }
 
 bool App::HandleQuitRequested()
