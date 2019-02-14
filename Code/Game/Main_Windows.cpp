@@ -40,14 +40,15 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			switch( asKey )
 			{
 			case KEY_ESC:
-				//Shut the app
-				g_theApp->HandleQuitRequested();
-				return 0;
 			case UP_ARROW:
+			case DOWN_ARROW:
 			case SPACE_KEY:				
 			case LEFT_ARROW:
 			case RIGHT_ARROW:
 			case TILDY_KEY:
+			case DEL_KEY:
+			case BACK_SPACE:
+			case ENTER_KEY:
 			case F1_KEY:
 			case F2_KEY:
 			case F3_KEY:
@@ -60,6 +61,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 				return 0;
 			break;
 			}
+			break;
 		}		
 
 		// Raw physical keyboard "key-was-just-released" event (case-insensitive, not translated)
@@ -84,18 +86,21 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 				return 0;
 			break;
 			}
+			break;
 		}
 
 		case WM_CHAR:
 		{
 			unsigned char asKey = (unsigned char) wParam;
 			
-			if(asKey >= 65 && asKey <= 90)
+			bool is_released = ((lParam & (1U << 31)) != 0);
+			if((asKey >= 65 && asKey <= 90 && !is_released) || (asKey >= 97 && asKey <= 122 && !is_released))
 			{
 				g_theApp->HandleCharacter(asKey);
 				return 0;
 			}
 		}
+		break;
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

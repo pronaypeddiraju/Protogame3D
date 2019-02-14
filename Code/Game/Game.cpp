@@ -85,6 +85,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case UP_ARROW:
 		case RIGHT_ARROW:
 		case LEFT_ARROW:
+		case DOWN_ARROW:
 		case SPACE_KEY:
 		case A_KEY:
 		case N_KEY:

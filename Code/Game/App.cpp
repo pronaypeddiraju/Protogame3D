@@ -172,6 +172,10 @@ bool App::HandleKeyPressed(unsigned char keyCode)
 		case UP_ARROW:
 		case RIGHT_ARROW:
 		case LEFT_ARROW:	
+		case DOWN_ARROW:
+		case DEL_KEY:
+		case BACK_SPACE:
+		case ENTER_KEY:
 		case F1_KEY:
 		case F2_KEY:
 		case F3_KEY:
@@ -192,6 +196,20 @@ bool App::HandleKeyPressed(unsigned char keyCode)
 			m_game = new Game();
 			m_game->StartUp();
 			return true;
+		}
+		case KEY_ESC:
+		{
+			if(!g_devConsole->IsOpen())
+			{
+				//Shut the app
+				g_theApp->HandleQuitRequested();
+				return true;
+			}
+			else
+			{
+				m_game->HandleKeyPressed(keyCode);
+				return true;
+			}
 		}
 		default:
 			//Nothing to worry about
