@@ -23,8 +23,6 @@ const char* APP_NAME = "RTS D3D11";	// ...becomes ???
 // This function is called by Windows whenever we ask it for notifications
 LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMessageCode, WPARAM wParam, LPARAM lParam )
 {
-	bool keyConsumed = false;
-
 	switch( wmMessageCode )
 	{
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
@@ -32,7 +30,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 		{
 			g_theApp->HandleQuitRequested();
 			return 0; // "Consumes" this message (tells Windows "okay, we handled it")
-		}
+		}		
 
 		// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
 		case WM_KEYDOWN:
@@ -44,7 +42,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			case KEY_ESC:
 				//Shut the app
 				g_theApp->HandleQuitRequested();
-				keyConsumed = true;
+				return 0;
 			case UP_ARROW:
 			case SPACE_KEY:				
 			case LEFT_ARROW:
@@ -59,13 +57,10 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			case F7_KEY:
 			case F8_KEY:
 				g_theApp->HandleKeyPressed(asKey);
-				keyConsumed = true;
-			break;
-			default:
-			//Do nothing
+				return 0;
 			break;
 			}
-		}
+		}		
 
 		// Raw physical keyboard "key-was-just-released" event (case-insensitive, not translated)
 		case WM_KEYUP:
@@ -73,14 +68,10 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			unsigned char asKey = (unsigned char) wParam;
 			switch( asKey )
 			{
-			case T_KEY :
-			case P_KEY :
 			case UP_ARROW:
 			case SPACE_KEY:				
 			case LEFT_ARROW:
 			case RIGHT_ARROW:
-			case A_KEY:
-			case N_KEY:
 			case F1_KEY:
 			case F2_KEY:
 			case F3_KEY:
@@ -90,8 +81,7 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			case F7_KEY:
 			case F8_KEY:
 				g_theApp->HandleKeyReleased(asKey);
-				keyConsumed = true;
-			default:
+				return 0;
 			break;
 			}
 		}
@@ -103,33 +93,9 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			if(asKey >= 65 && asKey <= 90)
 			{
 				g_theApp->HandleCharacter(asKey);
-				keyConsumed = true;
+				return 0;
 			}
-
-			/*
-			switch( asKey )
-			{
-			case T_KEY :
-			case P_KEY :
-			case A_KEY:
-			case N_KEY:
-				g_theApp->HandleCharacter(asKey);
-				keyConsumed = true;
-			break;
-			case 'E':
-			case 'e':
-			g_theApp->HandleQuitRequested();
-			keyConsumed = true;
-			default:
-			break;
-			}
-			*/
 		}
-	}
-
-	if(keyConsumed)
-	{
-		return 0;
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

@@ -145,6 +145,8 @@ void App::Update()
 	float deltaTime = static_cast<float>(m_timeAtThisFrameBegin - m_timeAtLastFrameBegin);
 	deltaTime = Clamp(deltaTime, 0.0f, 0.1f);
 
+	g_devConsole->UpdateConsole(deltaTime);
+
 	m_game->Update(deltaTime);
 }
 
@@ -202,6 +204,7 @@ bool App::HandleKeyReleased(unsigned char keyCode)
 {
 	switch(keyCode)
 	{
+		/*
 		case 'T':
 		{
 			//Implement code to return deltaTime to original value
@@ -214,6 +217,7 @@ bool App::HandleKeyReleased(unsigned char keyCode)
 			m_isPaused = false;
 			return true;
 		}
+		*/
 		case 38:
 		case 32:
 		case 39:
