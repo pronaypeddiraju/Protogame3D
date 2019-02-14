@@ -35,17 +35,6 @@ Game::Game()
 	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
 	g_devConsole->SetBitmapFont(*m_squirrelFont);
 
-	/*
-	m_textureTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_StbiFlippedAndOpenGL.png");
-	m_testImage = new Image("Data/Images/Test_StbiFlippedAndOpenGL.png");
-	m_spriteTest = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Test_SpriteSheet8x2.png");
-
-	m_explosionTexture = g_renderContext->CreateOrGetTextureFromFile("Data/Images/Explosion_5x5.png");
-	SpriteSheet* explosionSheet = new SpriteSheet(m_explosionTexture, IntVec2(5,5));
-	m_explosionPingPong = new SpriteAnimDefenition(*explosionSheet, 0, 24, 1.f, SPRITE_ANIM_PLAYBACK_PINGPONG);
-	m_explosionOnce = new SpriteAnimDefenition(*explosionSheet, 0, 24, 2.0f, SPRITE_ANIM_PLAYBACK_ONCE);
-	m_explosionLoop = new SpriteAnimDefenition(*explosionSheet, 0, 24, 0.5f, SPRITE_ANIM_PLAYBACK_LOOP);
-	*/
 }
 
 Game::~Game()
@@ -157,16 +146,7 @@ void Game::Shutdown()
 	delete g_mainCamera;
 	g_mainCamera = nullptr;
 
-	FreeResources();
-}
-
-void Game::FreeResources()
-{
-	delete m_squirrelFont;
-	m_squirrelFont = nullptr;
-
-	delete m_textureTest;
-	m_squirrelFont = nullptr;
+	//FreeResources();
 }
 
 void Game::HandleKeyReleased(unsigned char keyCode)
@@ -192,26 +172,15 @@ void Game::Render() const
 	//Setup what we are rendering to
 	g_mainCamera->SetColorTarget(colorTargetView);
 
-	//here we can also setup how big we want our target view to be
 	g_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(SCREEN_ASPECT * 100.f,100.f));
-
-	// start rendering
 	g_renderContext->BeginCamera(*g_mainCamera); 
-
-	//Get the sin of time to set screen color
-	Rgba screenBackground = Rgba::BLACK;
-	float sinTime = (sin(static_cast<float>(GetCurrentTimeSeconds()))  + 1.0f) * 0.5f;
-	screenBackground.b = sinTime;
-	
-	//Clear the screen
-	g_renderContext->ClearColorTargets(screenBackground);
+	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	g_renderContext->BindShader( m_shader );
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
 
-	//A2 implementation (using a add verts for quad)
 	std::vector<Vertex_PCU>  someBox;
 	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
 	g_renderContext->DrawVertexArray(someBox);
@@ -227,7 +196,6 @@ void Game::Render() const
 
 	g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
 
-	//End your camera
 	g_renderContext->EndCamera();
 }
 
@@ -236,168 +204,8 @@ void Game::PostRender()
 	//Debug bools
 	m_consoleDebugOnce = true;
 }
+
 /*
-void Game::DebugRenderTextures() const
-{
-	//Test to see if textures render
-	g_renderContext->BindTextureView(3, m_textureTest);
-	g_renderContext->SetBlendMode(BLEND_MODE_ALPHA);
-	std::vector<Vertex_PCU> boxVerts;
-	boxVerts.push_back(Vertex_PCU(Vec3(0.f,0.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(0.f,0.f)));
-	boxVerts.push_back(Vertex_PCU(Vec3(100.f,0.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(1.f,0.f)));
-	boxVerts.push_back(Vertex_PCU(Vec3(100.f,100.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(1.f,1.f)));
-
-	boxVerts.push_back(Vertex_PCU(Vec3(0.f,0.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(0.f,0.f)));
-	boxVerts.push_back(Vertex_PCU(Vec3(0.f,100.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(0.f,1.f)));
-	boxVerts.push_back(Vertex_PCU(Vec3(100.f,100.f,0.f), Rgba(1.f,1.f,1.f,1.f), Vec2(1.f,1.f)));
-	//addVertsForAABB2(boxVerts, box1Bounds, Rgba(1.f,1.f,0.f));
-	g_renderContext->DrawVertexArray(6, &boxVerts[0]);	//boxVerts.size()
-}
-*/
-/*
-void Game::DebugRenderSprites() const
-{
-	g_renderContext->BindTexture(m_spriteTest);
-	//Test to see if sprites render
-	SpriteSheet testSheet = SpriteSheet(m_spriteTest, IntVec2(8,2));
-	Vec2 uvAtBottomLeft = Vec2::ZERO;
-	Vec2 uvAtTopRight = Vec2::ONE;
-	//Get the sprite defenition here
-	SpriteDefenition sd = testSheet.GetSpriteDef(0);
-	sd.GetUVs(uvAtBottomLeft, uvAtTopRight);
-	AABB2 box = AABB2(Vec2(10.f,10.f), Vec2(50.f,50.f));
-	std::vector<Vertex_PCU> spriteVerts;
-	AddVertsForAABB2D(spriteVerts, box, Rgba(1.f, 1.f, 1.f, 1.f), uvAtBottomLeft, uvAtTopRight);
-	g_renderContext->DrawVertexArray(spriteVerts);
-}
-*/
-/*
-void Game::DebugRenderSpriteAnims() const
-{
-	//Sprite animation test
-	
-	Vec2 uvAtBottomLeft = Vec2::ZERO;
-	Vec2 uvAtTopRight = Vec2::ONE;
-
-	//Ping Pong Test
-	AABB2 animBoxPingPong = AABB2(Vec2(55.0f,5.0f), Vec2(75.f, 25.f));
-	std::vector<Vertex_PCU> animVertsPingPong;
-	SpriteDefenition sdAnimPingPong = m_explosionPingPong->GetSpriteDefAtTime(m_animTime);
-	sdAnimPingPong.GetUVs(uvAtBottomLeft, uvAtTopRight);
-	AddVertsForAABB2D(animVertsPingPong, animBoxPingPong, Rgba::WHITE, uvAtBottomLeft, uvAtTopRight);
-
-	//Once Test
-	AABB2 animBoxOnce = AABB2(Vec2(75.0f,5.0f), Vec2(95.f, 25.f));
-	std::vector<Vertex_PCU> animVertsOnce;
-	SpriteDefenition sdAnimOnce = m_explosionOnce->GetSpriteDefAtTime(m_animTime);
-	sdAnimOnce.GetUVs(uvAtBottomLeft, uvAtTopRight);
-	AddVertsForAABB2D(animVertsOnce, animBoxOnce, Rgba::GREEN, uvAtBottomLeft, uvAtTopRight);
-
-	//Loop test
-	AABB2 animBoxLoop = AABB2(Vec2(95.0f,5.0f), Vec2(115.f, 25.f));
-	std::vector<Vertex_PCU> animVertsLoop;
-	SpriteDefenition sdAnimLoop = m_explosionLoop->GetSpriteDefAtTime(m_animTime);
-	sdAnimLoop.GetUVs(uvAtBottomLeft, uvAtTopRight);
-	AddVertsForAABB2D(animVertsLoop, animBoxLoop, Rgba::RED, uvAtBottomLeft, uvAtTopRight);
-
-	g_renderContext->BindTexture(m_explosionTexture);
-	g_renderContext->SetBlendMode(BLEND_MODE_ADDITIVE);
-	g_renderContext->DrawVertexArray(animVertsPingPong);
-	g_renderContext->DrawVertexArray(animVertsOnce);
-	g_renderContext->DrawVertexArray(animVertsLoop);
-
-}
-*/
-/*
-void Game::DebugRenderTextAlignment() const
-{
-	g_renderContext->BindTexture(nullptr);
-	g_renderContext->SetBlendMode(BLEND_MODE_ALPHA);
-
-	//text Alignment Tests!
-	AABB2 textAlignBoundaryLeft = AABB2(Vec2(118.f, 8.f), Vec2(120.f, 42.f));
-	std::vector<Vertex_PCU> TextBoundaryLeftVerts;
-	AddVertsForAABB2D(TextBoundaryLeftVerts, textAlignBoundaryLeft, Rgba::WHITE);
-	AABB2 textAlignBoundaryRight = AABB2(Vec2(180.f, 8.f), Vec2(182.f, 42.f));
-	std::vector<Vertex_PCU> TextBoundaryRightVerts;
-	AddVertsForAABB2D(TextBoundaryRightVerts, textAlignBoundaryRight, Rgba::WHITE);
-	AABB2 textAlignBoundaryTop = AABB2(Vec2(118.f, 40.f), Vec2(182.f, 42.f));
-	std::vector<Vertex_PCU> TextBoundaryTopVerts;
-	AddVertsForAABB2D(TextBoundaryTopVerts, textAlignBoundaryTop, Rgba::WHITE);
-	AABB2 textAlignBoundaryBottom = AABB2(Vec2(118.f, 8.f), Vec2(182.f, 10.f));
-	std::vector<Vertex_PCU> TextBoundaryBottomVerts;
-	AddVertsForAABB2D(TextBoundaryBottomVerts, textAlignBoundaryBottom, Rgba::WHITE);
-
-	//Box to align
-	AABB2 boxToAlign = AABB2(Vec2(0.f,0.f), Vec2(4.f, 4.f));
-	std::vector<Vertex_PCU> boxToAlignVerts;
-	boxToAlign.AlignWithinBox(AABB2(Vec2(120.f,10.f), Vec2(180.f, 40.f)), Vec2::ALIGN_TOP_CENTERED);
-	AddVertsForAABB2D(boxToAlignVerts, boxToAlign, Rgba::BLUE);
-
-	g_renderContext->DrawVertexArray(TextBoundaryLeftVerts);
-	g_renderContext->DrawVertexArray(TextBoundaryRightVerts);
-	g_renderContext->DrawVertexArray(TextBoundaryTopVerts);
-	g_renderContext->DrawVertexArray(TextBoundaryBottomVerts);
-	g_renderContext->DrawVertexArray(boxToAlignVerts);
-
-	//Text alignment test
-	g_renderContext->BindTexture(m_squirrelFont->GetTexture());
-	std::vector<Vertex_PCU> fontVerts;
-
-	g_renderContext->BindTexture(nullptr);
-	boxToAlign = AABB2(Vec2(0.f,0.f), Vec2(4.f, 4.f));
-	boxToAlignVerts.clear();
-	boxToAlign.AlignWithinBox(AABB2(Vec2(120.f,10.f), Vec2(180.f, 40.f)), Vec2::ALIGN_RIGHT_TOP);
-	AddVertsForAABB2D(boxToAlignVerts, boxToAlign, Rgba::BLUE);
-	g_renderContext->DrawVertexArray(boxToAlignVerts);
-
-	g_renderContext->BindTexture(m_squirrelFont->GetTexture());
-	m_squirrelFont->AddVertsForTextInBox2D(fontVerts, AABB2(Vec2(150.f, 38.f), Vec2(180.f, 40.f)), 5.f, "Align Text", Rgba::RED, 1.f, Vec2::ALIGN_RIGHT_TOP, TEXT_BOX_MODE_SHRINK);
-	g_renderContext->DrawVertexArray(fontVerts);
-	fontVerts.clear();
-
-	m_squirrelFont->AddVertsForText2D(fontVerts, Vec2(120.f,20.f), 5.f, "Hello World", Rgba::BLACK);
-	g_renderContext->DrawVertexArray(fontVerts);
-	fontVerts.clear();
-
-	g_renderContext->BindTexture(nullptr);
-	boxToAlign = AABB2(Vec2(0.f,0.f), Vec2(4.f, 4.f));
-	boxToAlignVerts.clear();
-	boxToAlign.AlignWithinBox(AABB2(Vec2(120.f,10.f), Vec2(180.f, 40.f)), Vec2::ALIGN_LEFT_TOP);
-	AddVertsForAABB2D(boxToAlignVerts, boxToAlign, Rgba::BLUE);
-	g_renderContext->DrawVertexArray(boxToAlignVerts);
-
-	g_renderContext->BindTexture(m_squirrelFont->GetTexture());
-	//Get this checked out
-	m_squirrelFont->AddVertsForTextInBox2D(fontVerts, AABB2(Vec2(120.f, 10.f), Vec2(150.f, 40.f)), 5.f, "Align Text", Rgba::RED, 1.f, Vec2::ALIGN_LEFT_TOP, TEXT_BOX_MODE_SHRINK);
-	g_renderContext->DrawVertexArray(fontVerts);
-	fontVerts.clear();
-
-	g_renderContext->BindTexture(nullptr);
-	boxToAlign = AABB2(Vec2(0.f,0.f), Vec2(4.f, 4.f));
-	boxToAlignVerts.clear();
-	boxToAlign.AlignWithinBox(AABB2(Vec2(120.f,10.f), Vec2(180.f, 40.f)), Vec2::ALIGN_LEFT_BOTTOM);
-	AddVertsForAABB2D(boxToAlignVerts, boxToAlign, Rgba::BLUE);
-	g_renderContext->DrawVertexArray(boxToAlignVerts);
-
-	g_renderContext->BindTexture(m_squirrelFont->GetTexture());
-	m_squirrelFont->AddVertsForTextInBox2D(fontVerts, AABB2(Vec2(120.f, 10.f), Vec2(150.f, 40.f)), 5.f, "Align Text", Rgba::RED, 1.f, Vec2::ALIGN_LEFT_BOTTOM, TEXT_BOX_MODE_SHRINK);
-	g_renderContext->DrawVertexArray(fontVerts);
-	fontVerts.clear();
-
-	g_renderContext->BindTexture(nullptr);
-	boxToAlign = AABB2(Vec2(0.f,0.f), Vec2(4.f, 4.f));
-	boxToAlignVerts.clear();
-	boxToAlign.AlignWithinBox(AABB2(Vec2(120.f,10.f), Vec2(180.f, 40.f)), Vec2::ALIGN_RIGHT_BOTTOM);
-	AddVertsForAABB2D(boxToAlignVerts, boxToAlign, Rgba::BLUE);
-	g_renderContext->DrawVertexArray(boxToAlignVerts);
-
-	g_renderContext->BindTexture(m_squirrelFont->GetTexture());
-	m_squirrelFont->AddVertsForTextInBox2D(fontVerts, AABB2(Vec2(150.f, 10.f), Vec2(180.f, 40.f)), 5.f, "Align Text", Rgba::RED, 1.f, Vec2::ALIGN_RIGHT_BOTTOM, TEXT_BOX_MODE_SHRINK);
-	g_renderContext->DrawVertexArray(fontVerts);
-	fontVerts.clear();
-}
-
 void Game::DebugRender() const
 {
  	DebugRenderTextures();
