@@ -94,10 +94,13 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			unsigned char asKey = (unsigned char) wParam;
 			
 			bool is_released = ((lParam & (1U << 31)) != 0);
-			if((asKey >= 65 && asKey <= 90 && !is_released) || (asKey >= 97 && asKey <= 122 && !is_released))
+			if((asKey >= 20 && asKey <= 126 && !is_released))
 			{
-				g_theApp->HandleCharacter(asKey);
-				return 0;
+				if(asKey != 96)
+				{
+					g_theApp->HandleCharacter(asKey);
+					return 0;
+				}
 			}
 		}
 		break;
