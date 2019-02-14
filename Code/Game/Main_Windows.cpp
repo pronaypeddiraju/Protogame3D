@@ -96,7 +96,8 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			bool is_released = ((lParam & (1U << 31)) != 0);
 			if((asKey >= 20 && asKey <= 126 && !is_released))
 			{
-				if(asKey != 96)
+				//Ignore escape character and tilde
+				if(asKey != 96 && asKey != 27)
 				{
 					g_theApp->HandleCharacter(asKey);
 					return 0;
