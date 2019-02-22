@@ -1,3 +1,4 @@
+//------------------------------------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Input/InputSystem.hpp"
@@ -15,18 +16,20 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Math/Matrix44.hpp"
 
+//------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
-Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
+//Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
+
 float g_shakeAmount = 0.0f;
-//ScreenColor
-Rgba* g_clearScreenColor = nullptr;
 
 RandomNumberGenerator* g_randomNumGen;
 extern RenderContext* g_renderContext;	// Declare these first
 extern AudioSystem* g_audio;
 bool g_debugMode = false;
 
+//------------------------------------------------------------------------------------------------------------------------------
 Game::Game()
 {
 	m_isGameAlive = true;
@@ -45,12 +48,18 @@ Game::~Game()
 void Game::StartUp()
 {
 	//Create the Camera and setOrthoView
-	g_mainCamera = new Camera();
-	g_mainCamera->SetColorTarget(nullptr);
+	m_mainCamera = new Camera();
+	m_mainCamera->SetColorTarget(nullptr);
 
-	g_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
+	//Create a devConsole Cam
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetColorTarget(nullptr);
+	m_devConsoleCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
 
-	g_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
+	//Set Projection Perspective for new Cam
+	//m_mainCamera->SetProjectionPerspective( m_camFOVDegrees, 0.1f, 100.0f );
+
+	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
 	g_devConsole->PrintString(Rgba::BLUE, "this is a test string");
 	g_devConsole->PrintString(Rgba::RED, "this is also a test string");
@@ -135,8 +144,8 @@ void Game::DebugEnabled()
 
 void Game::Shutdown()
 {
-	delete g_mainCamera;
-	g_mainCamera = nullptr;
+	delete m_mainCamera;
+	m_mainCamera = nullptr;
 
 	//FreeResources();
 }
@@ -177,10 +186,17 @@ void Game::Render() const
 	ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 
 	//Setup what we are rendering to
-	g_mainCamera->SetColorTarget(colorTargetView);
+	m_mainCamera->SetColorTarget(colorTargetView);
 
-	g_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(SCREEN_ASPECT * 100.f,100.f));
-	g_renderContext->BeginCamera(*g_mainCamera); 
+	// Move the camera to where it is in the scene
+	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
+	//Matrix44 camTransform = Matrix44::FromEulerZXY( m_camEuler, m_camPosition ); 
+	//m_mainCamera->SetCameraMatrix( camTransform );
+
+	//Old Implementation
+	m_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(SCREEN_ASPECT * 100.f,100.f));
+	
+	g_renderContext->BeginCamera(*m_mainCamera); 
 	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
@@ -207,7 +223,7 @@ void Game::Render() const
 	if(g_devConsole->IsOpen())
 	{
 		g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
-		g_devConsole->Render(*g_renderContext, *g_mainCamera, DEVCONSOLE_LINE_HEIGHT);
+		g_devConsole->Render(*g_renderContext, *m_mainCamera, DEVCONSOLE_LINE_HEIGHT);
 	}
 	
 	g_renderContext->EndCamera();
@@ -245,6 +261,8 @@ void Game::Update( float deltaTime )
 	ClearGarbageEntities();	
 }
 
+//Use this chunk of code only for screen shake!
+/*
 void Game::UpdateCamera(float deltaTime)
 {
 	g_mainCamera = new Camera();
@@ -271,6 +289,7 @@ void Game::UpdateCamera(float deltaTime)
 	translate2D.ClampLength(MAX_SHAKE);
 	g_mainCamera->Translate2D(translate2D);
 }
+*/
 
 void Game::ClearGarbageEntities()
 {

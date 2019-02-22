@@ -16,7 +16,7 @@ extern App* g_theApp;
 HWND g_hWnd = nullptr;							// ...becomes WindowContext::m_windowHandle
 HDC g_displayDeviceContext = nullptr;			// ...becomes WindowContext::m_displayContext
 HGLRC g_openGLRenderingContext = nullptr;		// ...becomes RenderContext::m_apiRenderingContext
-const char* APP_NAME = "RTS D3D11";	// ...becomes ???
+const char* APP_NAME = "Protogame 3D";	// ...becomes ???
 
 //-----------------------------------------------------------------------------------------------
 // Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.

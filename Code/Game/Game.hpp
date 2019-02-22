@@ -9,6 +9,7 @@ class SpriteAnimDefenition;
 class TextureView;
 class Image;
 class Shader;
+struct Camera;
 
 class Game
 {
@@ -52,4 +53,9 @@ public:
 	Shader*								m_shader = nullptr;
 	std::string							m_defaultShaderPath = "default_unlit.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
+
+	Camera*								m_mainCamera = nullptr;
+	Camera*								m_devConsoleCamera = nullptr;
+	Rgba*								m_clearScreenColor = nullptr;
+	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View
 };
