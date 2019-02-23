@@ -57,7 +57,9 @@ void Game::StartUp()
 	m_devConsoleCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
 
 	//Set Projection Perspective for new Cam
-	//m_mainCamera->SetProjectionPerspective( m_camFOVDegrees, 0.1f, 100.0f );
+	//m_camPosition = Vec3(0.f, 0.f, -10.f);
+	//m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f );
+	m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
@@ -96,11 +98,32 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case LEFT_ARROW:
 		case DOWN_ARROW:
 		case SPACE_KEY:
-		case A_KEY:
 		case N_KEY:
 		case F1_KEY:
 		case F2_KEY:
 		case F3_KEY:
+		case A_KEY:
+		{
+			//Handle left movement
+			m_inputPosition.x -= 0.1f;
+		}
+		break;
+		case W_KEY:
+		{
+			//Handle forward movement
+			m_inputPosition.y += 0.1f;
+		}
+		break;
+		case S_KEY:
+		{
+			//Handle backward movement
+			m_inputPosition.y -= 0.1f;
+		}
+		case D_KEY:
+		{
+			//Handle right movement
+			m_inputPosition.x += 0.1f;
+		}
 		break;
 		case F4_KEY:
 		{
@@ -190,12 +213,11 @@ void Game::Render() const
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
-	//Matrix44 camTransform = Matrix44::FromEulerZXY( m_camEuler, m_camPosition ); 
-	//m_mainCamera->SetCameraMatrix( camTransform );
+	//Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
+	//m_mainCamera->SetCameraMatrix(camTransform);
 
-	//Old Implementation
-	m_mainCamera->SetOrthoView(Vec2::ZERO, Vec2(SCREEN_ASPECT * 100.f,100.f));
-	
+	m_mainCamera->UpdateUniformBuffer(g_renderContext);
+
 	g_renderContext->BeginCamera(*m_mainCamera); 
 	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
@@ -204,13 +226,12 @@ void Game::Render() const
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
 
-	std::vector<Vertex_PCU>  someBox;
-	AddVertsForAABB2D(someBox, AABB2(Vec2(90.f,50.f), Vec2(150.f, 90.f)), Rgba::WHITE);
-	g_renderContext->DrawVertexArray(someBox);
-
-	std::vector<Vertex_PCU> someLine;
-	AddVertsForLine2D(someLine, Vec2(20.f, 20.f), Vec2(50.f, 50.f), 2.f, Rgba::WHITE);
-	g_renderContext->DrawVertexArray(someLine);
+	std::vector<Vertex_PCU> triangleVerts;
+	triangleVerts.resize(3 * sizeof(Vertex_PCU));
+	triangleVerts[0].m_position = Vec3(-1.f, -1.f, 0.f);
+	triangleVerts[1].m_position = Vec3(1.f, -1.f, 0.f);
+	triangleVerts[2].m_position = Vec3(-1.f, 1.f, 0.f);
+	g_renderContext->DrawVertexArray(triangleVerts);
 
 	if(!m_consoleDebugOnce)
 	{

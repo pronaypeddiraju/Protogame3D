@@ -2,6 +2,7 @@
 #include "Engine/Math/Vertex_PCU.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Math/Matrix44.hpp"
 
 class Texture;
 class BitmapFont;
@@ -51,11 +52,17 @@ public:
 
 	//D3D11 stuff
 	Shader*								m_shader = nullptr;
-	std::string							m_defaultShaderPath = "default_unlit.hlsl";
+	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
 	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View
+
+	Vec3								m_camEuler = Vec3::ZERO;
+	eRotationOrder						m_rotationOrder = ROTATION_ORDER_DEFAULT;
+	Vec3								m_camPosition = Vec3::ZERO;
+
+	Vec3								m_inputPosition = Vec3::ZERO;
 };

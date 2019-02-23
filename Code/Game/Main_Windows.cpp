@@ -1,4 +1,4 @@
-#define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
+ #define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
 #include <windows.h>			// #include this (massive, platform-specific) header in very few places
 #include <math.h>
 #include <cassert>
@@ -57,6 +57,10 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			case F6_KEY:
 			case F7_KEY:
 			case F8_KEY:
+			case A_KEY:
+			case W_KEY:
+			case S_KEY:
+			case D_KEY:
 				g_theApp->HandleKeyPressed(asKey);
 				return 0;
 			break;
