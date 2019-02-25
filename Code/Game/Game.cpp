@@ -17,6 +17,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/Matrix44.hpp"
+#include "Engine/Renderer/ColorTargetView.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -57,9 +58,10 @@ void Game::StartUp()
 	m_devConsoleCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
 
 	//Set Projection Perspective for new Cam
-	//m_camPosition = Vec3(0.f, 0.f, -10.f);
-	//m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f );
-	m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
+	m_camPosition = Vec3(0.f, 0.f, -10.f);
+	m_mainCamera->SetColorTarget(nullptr);
+	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
+	//m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
@@ -105,24 +107,25 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case A_KEY:
 		{
 			//Handle left movement
-			m_inputPosition.x -= 0.1f;
+			m_camPosition.x -= 0.1f;
 		}
 		break;
 		case W_KEY:
 		{
 			//Handle forward movement
-			m_inputPosition.y += 0.1f;
+			m_camPosition.z += 0.1f;
 		}
 		break;
 		case S_KEY:
 		{
 			//Handle backward movement
-			m_inputPosition.y -= 0.1f;
+			m_camPosition.z -= 0.1f;
 		}
+		break;
 		case D_KEY:
 		{
 			//Handle right movement
-			m_inputPosition.x += 0.1f;
+			m_camPosition.x += 0.1f;
 		}
 		break;
 		case F4_KEY:
@@ -213,8 +216,8 @@ void Game::Render() const
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
-	//Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
-	//m_mainCamera->SetCameraMatrix(camTransform);
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_camPosition, m_rotationOrder ); 
+	m_mainCamera->SetModelMatrix(camTransform);
 
 	m_mainCamera->UpdateUniformBuffer(g_renderContext);
 
@@ -233,6 +236,7 @@ void Game::Render() const
 	triangleVerts[2].m_position = Vec3(-1.f, 1.f, 0.f);
 	g_renderContext->DrawVertexArray(triangleVerts);
 
+	/*
 	if(!m_consoleDebugOnce)
 	{
 		EventArgs* args = new EventArgs("TestString", "This is a test");
@@ -246,7 +250,8 @@ void Game::Render() const
 		g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
 		g_devConsole->Render(*g_renderContext, *m_mainCamera, DEVCONSOLE_LINE_HEIGHT);
 	}
-	
+	*/
+
 	g_renderContext->EndCamera();
 }
 
@@ -277,6 +282,11 @@ void Game::Update( float deltaTime )
 
 	CheckXboxInputs();
 	m_animTime += deltaTime;
+	
+	//Update the camera's transform
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_camPosition, m_rotationOrder ); 
+	m_mainCamera->SetModelMatrix(camTransform);
+	
 	CheckCollisions();
 
 	ClearGarbageEntities();	

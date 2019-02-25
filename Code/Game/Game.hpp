@@ -58,11 +58,9 @@ public:
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
+	
 	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View
-
 	Vec3								m_camEuler = Vec3::ZERO;
 	eRotationOrder						m_rotationOrder = ROTATION_ORDER_DEFAULT;
 	Vec3								m_camPosition = Vec3::ZERO;
-
-	Vec3								m_inputPosition = Vec3::ZERO;
 };
