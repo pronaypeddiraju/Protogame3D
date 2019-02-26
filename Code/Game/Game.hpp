@@ -48,6 +48,7 @@ public:
 private:
 	bool								m_isGameAlive = false;
 	bool								m_consoleDebugOnce = false;
+	bool								m_devConsoleSetup = false;
 
 public:
 	SoundID								m_testAudioID = NULL;

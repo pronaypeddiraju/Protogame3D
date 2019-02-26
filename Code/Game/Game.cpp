@@ -57,7 +57,7 @@ void Game::StartUp()
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget(nullptr);
 
-	m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
+	//m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
 
 	//Set Projection Perspective for new Cam
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
@@ -192,6 +192,9 @@ void Game::Shutdown()
 	delete m_mainCamera;
 	m_mainCamera = nullptr;
 
+	delete m_devConsoleCamera;
+	m_devConsoleCamera = nullptr;
+
 	//FreeResources();
 }
 
@@ -232,6 +235,7 @@ void Game::Render() const
 
 	//Setup what we are rendering to
 	m_mainCamera->SetColorTarget(colorTargetView);
+	m_devConsoleCamera->SetColorTarget(colorTargetView);
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
@@ -256,7 +260,8 @@ void Game::Render() const
 
 	g_renderContext->DrawVertexArray(triangleVerts);
 
-	
+	g_renderContext->EndCamera();
+
 	if(!m_consoleDebugOnce)
 	{
 		EventArgs* args = new EventArgs("TestString", "This is a test");
@@ -266,12 +271,11 @@ void Game::Render() const
 	}
 
 	if(g_devConsole->IsOpen())
-	{
-		g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
+	{	
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}
 
-	g_renderContext->EndCamera();
+	
 }
 
 void Game::PostRender()
@@ -283,7 +287,7 @@ void Game::PostRender()
 void Game::Update( float deltaTime )
 {
 
-	if(g_devConsole->GetFrameCount() > 1)
+	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
 		ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 		float height = colorTargetView->m_height;
@@ -293,8 +297,8 @@ void Game::Update( float deltaTime )
 		float desiredHeight = WORLD_HEIGHT; 
 		float desiredWidth = desiredHeight * aspect; 
 
-		m_devConsoleCamera->SetOrthoView(Vec2(-desiredWidth * 0.5f, -desiredHeight * 0.5f), Vec2(desiredWidth * 0.5f, desiredHeight * 0.5f));
-		//m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
+		m_devConsoleCamera->SetOrthoView(Vec2(-desiredWidth * 0.5f * aspect, -desiredHeight * 0.5f), Vec2(desiredWidth * 0.5f * aspect, desiredHeight * 0.5f));
+		m_devConsoleSetup = true;
 	}
 
 	//UpdateCamera(deltaTime);
