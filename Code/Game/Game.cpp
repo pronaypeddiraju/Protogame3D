@@ -18,6 +18,7 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/Matrix44.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
+#include "Engine/Renderer/CPUMesh.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -79,6 +80,22 @@ void Game::StartUp()
 
 	//Get the test texture
 	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
+
+	//Meshes for A4
+	CPUMesh mesh;
+
+	// create a cube (centered at zero, with sides 2 length)
+	/*
+	CPUMeshAddCube( &mesh, AABB3::ThatContains( Vec3(-1.0f), Vec3( 1.0f ) ) ); 
+	m_cube = new GPUMesh( ctx ); 
+	m_cube->CreateFromCPUMesh( mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
+
+																// create a sphere, cenetered at zero, with 
+	mesh.Clear();
+	CPUMeshAddUVSphere( &mesh, vec3::ZERO, 1.0f );  
+	m_sphere = new GPUMesh( ctx ); 
+	m_sphere->CreateFromCPUMesh( mesh, GPU_MEMORY_USAGE_STATIC );
+	*/
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -271,12 +288,13 @@ void Game::Update( float deltaTime )
 		ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 		float height = colorTargetView->m_height;
 		float width = colorTargetView->m_width;
+		float aspect = width / height; 
 
-		//This clearly does fuck all
-		//m_devConsoleCamera->SetOrthoView(Vec2(-width * 0.5f, -height * 0.5f), Vec2(width * 0.5f, height * 0.5f));
-		
-		//Matrix44 modelMatrix = Matrix44::MakeFromEuler(m_camEuler, m_camPosition, ROTATION_ORDER_ZXY);
-		//m_devConsoleCamera->SetModelMatrix(modelMatrix);
+		float desiredHeight = WORLD_HEIGHT; 
+		float desiredWidth = desiredHeight * aspect; 
+
+		m_devConsoleCamera->SetOrthoView(Vec2(-desiredWidth * 0.5f, -desiredHeight * 0.5f), Vec2(desiredWidth * 0.5f, desiredHeight * 0.5f));
+		//m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
 	}
 
 	//UpdateCamera(deltaTime);

@@ -1,17 +1,24 @@
+//------------------------------------------------------------------------------------------------------------------------------
 #pragma once
+//Engine Systems
 #include "Engine/Math/Vertex_PCU.hpp"
-#include "Game/GameCommon.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/Matrix44.hpp"
+//Game Systems
+#include "Game/GameCommon.hpp"
 
+//------------------------------------------------------------------------------------------------------------------------------
 class Texture;
 class BitmapFont;
 class SpriteAnimDefenition;
 class TextureView;
 class Image;
 class Shader;
+class GPUMesh;
+
 struct Camera;
 
+//------------------------------------------------------------------------------------------------------------------------------
 class Game
 {
 public:
@@ -66,4 +73,12 @@ public:
 
 	float								m_devConsoleScreenWidth = 0.f;
 	float								m_devConsoleScreenHeight = 0.f;
+
+	//FOR ASSIGNMENT 4:
+	// Define the shapes, and how are they positionedin the world; 
+	GPUMesh*							m_cube; 
+	Matrix44							m_cubeTransform; // cube's model matrix
+
+	GPUMesh*							m_sphere;
+	Matrix44							m_sphereTransform;   // sphere's model matrix
 };
