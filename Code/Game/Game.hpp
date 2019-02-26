@@ -63,4 +63,7 @@ public:
 	Vec3								m_camEuler = Vec3::ZERO;
 	eRotationOrder						m_rotationOrder = ROTATION_ORDER_DEFAULT;
 	Vec3								m_camPosition = Vec3::ZERO;
+
+	float								m_devConsoleScreenWidth = 0.f;
+	float								m_devConsoleScreenHeight = 0.f;
 };

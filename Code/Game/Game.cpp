@@ -55,7 +55,8 @@ void Game::StartUp()
 	//Create a devConsole Cam
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget(nullptr);
-	m_devConsoleCamera->SetOrthoView(Vec2::ZERO, Vec2(100.f * SCREEN_ASPECT, 100.f));
+
+	m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
 
 	//Set Projection Perspective for new Cam
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
@@ -238,7 +239,7 @@ void Game::Render() const
 
 	g_renderContext->DrawVertexArray(triangleVerts);
 
-	/*
+	
 	if(!m_consoleDebugOnce)
 	{
 		EventArgs* args = new EventArgs("TestString", "This is a test");
@@ -250,9 +251,8 @@ void Game::Render() const
 	if(g_devConsole->IsOpen())
 	{
 		g_renderContext->BindTextureViewWithSampler( 0U, m_squirrelFont->GetTexture()); 
-		g_devConsole->Render(*g_renderContext, *m_mainCamera, DEVCONSOLE_LINE_HEIGHT);
+		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}
-	*/
 
 	g_renderContext->EndCamera();
 }
@@ -263,22 +263,22 @@ void Game::PostRender()
 	m_consoleDebugOnce = true;
 }
 
-/*
-void Game::DebugRender() const
-{
- 	DebugRenderTextures();
-	g_renderContext->BindTexture(nullptr);
- 	DebugRenderSprites();
-	g_renderContext->BindTexture(nullptr);
- 	DebugRenderSpriteAnims();
-	g_renderContext->BindTexture(nullptr);
- 	DebugRenderTextAlignment();
-	g_renderContext->BindTexture(nullptr);
-}
-*/
-
 void Game::Update( float deltaTime )
 {
+
+	if(g_devConsole->GetFrameCount() > 1)
+	{
+		ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
+		float height = colorTargetView->m_height;
+		float width = colorTargetView->m_width;
+
+		//This clearly does fuck all
+		//m_devConsoleCamera->SetOrthoView(Vec2(-width * 0.5f, -height * 0.5f), Vec2(width * 0.5f, height * 0.5f));
+		
+		//Matrix44 modelMatrix = Matrix44::MakeFromEuler(m_camEuler, m_camPosition, ROTATION_ORDER_ZXY);
+		//m_devConsoleCamera->SetModelMatrix(modelMatrix);
+	}
+
 	//UpdateCamera(deltaTime);
 	g_renderContext->m_frameCount++;
 

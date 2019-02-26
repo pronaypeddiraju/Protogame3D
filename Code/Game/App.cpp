@@ -1,7 +1,8 @@
+//------------------------------------------------------------------------------------------------------------------------------
 #include "Game/App.hpp"
+//Engine Systems
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
-#include "Game/Game.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/XMLUtils/XMLUtils.hpp"
 #include "Engine/Core/NamedStrings.hpp"
@@ -9,22 +10,13 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
-
-/* CUSTOM INCLUDE ORDER
-#include "Game/App.hpp"	// Put the "same" hpp (App.hpp for App.cpp)
+//Game Systems
 #include "Game/Game.hpp"
-#include "Game/GameCommon.hpp"
-#include "Engine/EngineCommon.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
-#include <stdio.h>
-*/
 
 App* g_theApp = nullptr;
 
 App::App()
-{
-	//Constructor method
-	
+{	
 }
 
 App::~App()

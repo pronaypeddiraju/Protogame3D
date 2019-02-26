@@ -91,6 +91,7 @@ static bool AppWindowProc( void* windowHandle, uint32_t wmMessageCode, uintptr_t
 	return false; 
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
 void CreateWindowAndRenderContext( float clientAspect )
 {
 	g_windowContext = new WindowContext();
