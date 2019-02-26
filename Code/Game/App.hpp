@@ -11,7 +11,7 @@ class App
 public:
 	//Public methods
 
-	App(void* hwndReference);
+	App();
 	~App();
 	
 	static bool Command_Quit(EventArgs& args);

@@ -61,6 +61,7 @@ void Game::StartUp()
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
+	
 	//m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
@@ -230,10 +231,11 @@ void Game::Render() const
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
 
 	std::vector<Vertex_PCU> triangleVerts;
-	triangleVerts.resize(3 * sizeof(Vertex_PCU));
-	triangleVerts[0].m_position = Vec3(-1.f, -1.f, 0.f);
-	triangleVerts[1].m_position = Vec3(1.f, -1.f, 0.f);
-	triangleVerts[2].m_position = Vec3(-1.f, 1.f, 0.f);
+	
+	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, -1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
+	triangleVerts.push_back(Vertex_PCU(Vec3(1.f, -1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
+	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, 1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
+
 	g_renderContext->DrawVertexArray(triangleVerts);
 
 	/*

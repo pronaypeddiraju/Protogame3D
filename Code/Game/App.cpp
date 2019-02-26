@@ -21,8 +21,7 @@
 
 App* g_theApp = nullptr;
 
-App::App(void* hwndReference)
-	:	m_appWindowHandle(hwndReference)
+App::App()
 {
 	//Constructor method
 	
@@ -69,7 +68,8 @@ void App::StartUp()
 
 	g_eventSystem = new EventSystems();
 
-	g_renderContext = new RenderContext(m_appWindowHandle);
+	//This is now being set in Main_Windows.cpp
+	//g_renderContext = new RenderContext(m_appWindowHandle);
 	
 	g_inputSystem = new InputSystem();
 
