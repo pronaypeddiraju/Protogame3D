@@ -54,6 +54,7 @@ public:
 	SoundID								m_testAudioID = NULL;
 	
 	TextureView*						m_textureTest = nullptr;
+	TextureView*						m_boxTexture = nullptr;
 	BitmapFont*							m_squirrelFont = nullptr;
 	Image*								m_testImage = nullptr;
 	float								m_animTime = 0.f;
@@ -62,6 +63,7 @@ public:
 	Shader*								m_shader = nullptr;
 	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
+	std::string							m_boxTexturePath = "woodcrate.jpg";
 
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;

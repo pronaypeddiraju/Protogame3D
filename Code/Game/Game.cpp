@@ -83,15 +83,16 @@ void Game::StartUp()
 
 	//Get the test texture
 	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
+	m_boxTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_boxTexturePath);
 
 	//Meshes for A4
 	CPUMesh mesh;
-	/*
+	
 	// create a cube (centered at zero, with sides 2 length)
 	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, 0.f), Vec3(0.5f, 0.5f, 0.f), 1.f ) ); 
 	m_cube = new GPUMesh( g_renderContext ); 
 	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
-
+	/*
 	// create a sphere, cenetered at zero, with 
 	mesh.Clear();
 	CPUMeshAddUVSphere( &mesh, vec3::ZERO, 1.0f );  
@@ -262,6 +263,10 @@ void Game::Render() const
 
 	g_renderContext->DrawVertexArray(triangleVerts);
 
+	//Render the cube
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);  
+	g_renderContext->DrawMesh( m_cube ); 
+
 	g_renderContext->EndCamera();
 
 	if(!m_consoleDebugOnce)
@@ -305,6 +310,11 @@ void Game::Update( float deltaTime )
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_camPosition, m_rotationOrder ); 
 	m_mainCamera->SetModelMatrix(camTransform);
 	
+	// Set the cube to rotate around y (which is up currently),
+	// and move the object to the left by 5 units (-x)
+	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, static_cast<float>(GetCurrentTimeSeconds()), 0.0f), Vec3(-5.0f, 0.0f, 0.0f), m_rotationOrder ); 
+	g_renderContext->SetModelMatrix( m_cubeTransform );
+
 	CheckCollisions();
 
 	ClearGarbageEntities();	

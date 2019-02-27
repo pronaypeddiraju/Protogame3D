@@ -42,6 +42,12 @@ cbuffer camera_constants : register(b2)
 };
 
 //--------------------------------------------------------------------------------------
+cbuffer model_constants : register(b3)
+{
+	float4x4 MODEL;  // LOCAL_TO_WORLD
+}
+
+//--------------------------------------------------------------------------------------
 // Texures & Samplers
 // ------
 // Another option for external data is a Texture.  This is usually a large
@@ -86,7 +92,7 @@ v2f_t VertexFunction(vs_input_t input)
    v2f_t v2f = (v2f_t)0;
 
    float4 local_pos = float4( input.position, 1.0f ); 
-   float4 world_pos = local_pos; // mul( MODEL, local_pos ); 
+   float4 world_pos = mul( MODEL, local_pos );
    float4 view_pos = mul( VIEW, world_pos ); 
    float4 clip_pos = mul( PROJECTION, view_pos ); 
 
