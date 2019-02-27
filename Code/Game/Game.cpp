@@ -1,24 +1,27 @@
 //------------------------------------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Renderer/Camera.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
+//Engine Systems
 #include "Engine/Audio/AudioSystem.hpp"
-#include "Engine/Renderer/SpriteSheet.hpp"
-#include "Engine/Math/AABB2.hpp"
-#include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Core/Image.hpp"
 #include "Engine/Core/DevConsole.hpp"
-#include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystems.hpp"
+#include "Engine/Core/Image.hpp"
+#include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/Time.hpp"
-#include "Engine/Renderer/TextureView.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/AABB2.hpp"
+#include "Engine/Math/AABB3.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Matrix44.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
 #include "Engine/Renderer/CPUMesh.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -83,14 +86,13 @@ void Game::StartUp()
 
 	//Meshes for A4
 	CPUMesh mesh;
-
-	// create a cube (centered at zero, with sides 2 length)
 	/*
-	CPUMeshAddCube( &mesh, AABB3::ThatContains( Vec3(-1.0f), Vec3( 1.0f ) ) ); 
-	m_cube = new GPUMesh( ctx ); 
-	m_cube->CreateFromCPUMesh( mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
+	// create a cube (centered at zero, with sides 2 length)
+	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, 0.f), Vec3(0.5f, 0.5f, 0.f), 1.f ) ); 
+	m_cube = new GPUMesh( g_renderContext ); 
+	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
 
-																// create a sphere, cenetered at zero, with 
+	// create a sphere, cenetered at zero, with 
 	mesh.Clear();
 	CPUMeshAddUVSphere( &mesh, vec3::ZERO, 1.0f );  
 	m_sphere = new GPUMesh( ctx ); 
@@ -289,15 +291,7 @@ void Game::Update( float deltaTime )
 
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
-		ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
-		float height = colorTargetView->m_height;
-		float width = colorTargetView->m_width;
-		float aspect = width / height; 
-
-		float desiredHeight = WORLD_HEIGHT; 
-		float desiredWidth = desiredHeight * aspect; 
-
-		m_devConsoleCamera->SetOrthoView(Vec2(-desiredWidth * 0.5f * aspect, -desiredHeight * 0.5f), Vec2(desiredWidth * 0.5f * aspect, desiredHeight * 0.5f));
+		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 		m_devConsoleSetup = true;
 	}
 
