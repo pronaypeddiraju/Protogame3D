@@ -55,6 +55,7 @@ public:
 	
 	TextureView*						m_textureTest = nullptr;
 	TextureView*						m_boxTexture = nullptr;
+	TextureView*						m_sphereTexture = nullptr;
 	BitmapFont*							m_squirrelFont = nullptr;
 	Image*								m_testImage = nullptr;
 	float								m_animTime = 0.f;
@@ -64,6 +65,7 @@ public:
 	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 	std::string							m_boxTexturePath = "woodcrate.jpg";
+	std::string							m_sphereTexturePath = "2k_earth_daymap.jpg";
 
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
@@ -84,4 +86,7 @@ public:
 
 	GPUMesh*							m_sphere;
 	Matrix44							m_sphereTransform;   // sphere's model matrix
+
+	GPUMesh*							m_quad;
+	Matrix44							m_quadTransform;   // quad's model matrix
 };
