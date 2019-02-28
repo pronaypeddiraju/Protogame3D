@@ -84,7 +84,7 @@ void Game::StartUp()
 	g_eventSystem->SubscribeEventCallBackFn("TestEvent", TestEvent);
 
 	//Get the Shader
-	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_defaultShaderPath);
+	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_xmlShaderPath);
 	m_shader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
 
 	//Get the test texture
@@ -105,6 +105,7 @@ void Game::StartUp()
 	m_cube = new GPUMesh( g_renderContext ); 
 	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
 	
+
 	// create a sphere, cenetered at zero, with 
 	mesh.Clear();
 	CPUMeshAddUVSphere( &mesh, Vec3::ZERO, 1.0f );  
@@ -140,80 +141,40 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case A_KEY:
 		{
 			//Handle left movement
-			//m_camPosition.x -= 0.1f;
-
-			// compute a movement vector based on keyboard/gamepad input (your choice)
-			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
-
-			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
 			float speed = 0.1f; 
+			worldMovementDirection *= (speed); 
 
-			// compute actual local movement
-			localMovementDirection *= (speed); 
-
-			// move relative to the camera's orientation;
-			// note: try not doing this to get a better understanding of why it is necessary;  
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
 			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case W_KEY:
 		{
 			//Handle forward movement
-			//m_camPosition.z += 0.1f;
-
-			// compute a movement vector based on keyboard/gamepad input (your choice)
-			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetKVector();
-
-			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector();
 			float speed = 0.1f; 
+			worldMovementDirection *= (speed); 
 
-			// compute actual local movement
-			localMovementDirection *= (speed); 
-
-			// move relative to the camera's orientation;
-			// note: try not doing this to get a better understanding of why it is necessary;  
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
 			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case S_KEY:
 		{
 			//Handle backward movement
-			//m_camPosition.z -= 0.1f;
-
-			// compute a movement vector based on keyboard/gamepad input (your choice)
-			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetKVector() * -1.f;
-
-			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector() * -1.f;
 			float speed = 0.1f; 
+			worldMovementDirection *= (speed); 
 
-			// compute actual local movement
-			localMovementDirection *= (speed); 
-
-			// move relative to the camera's orientation;
-			// note: try not doing this to get a better understanding of why it is necessary;  
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
 			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case D_KEY:
 		{
 			//Handle right movement
-			//m_camPosition.x += 0.1f;
-
-			// compute a movement vector based on keyboard/gamepad input (your choice)
-			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetIVector();
-
-			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector();
 			float speed = 0.1f; 
+			worldMovementDirection *= (speed); 
 
-			// compute actual local movement
-			localMovementDirection *= (speed); 
-
-			// move relative to the camera's orientation;
-			// note: try not doing this to get a better understanding of why it is necessary;  
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
 			m_camPosition += worldMovementDirection; 
 		}
 		break;
@@ -263,6 +224,12 @@ void Game::Shutdown()
 
 	delete m_devConsoleCamera;
 	m_devConsoleCamera = nullptr;
+
+	delete m_cube;
+	m_cube = nullptr;
+
+	delete m_sphere;
+	m_sphere = nullptr;
 
 	//FreeResources();
 }
@@ -339,7 +306,7 @@ void Game::Render() const
 	*/
 
 	//Render the cube
-	g_renderContext->BindTextureViewWithSampler(0U, m_textureTest);  
+	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
 	g_renderContext->SetModelMatrix(m_cubeTransform);
 	g_renderContext->DrawMesh( m_cube ); 
 
