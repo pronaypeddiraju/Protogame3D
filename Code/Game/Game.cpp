@@ -21,6 +21,7 @@
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +81,7 @@ void Game::StartUp()
 
 	//Get the Shader
 	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_defaultShaderPath);
+	m_shader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
 
 	//Get the test texture
 	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);

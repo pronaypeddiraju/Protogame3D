@@ -86,7 +86,4 @@ public:
 
 	GPUMesh*							m_sphere;
 	Matrix44							m_sphereTransform;   // sphere's model matrix
-
-	GPUMesh*							m_quad;
-	Matrix44							m_quadTransform;   // quad's model matrix
 };
