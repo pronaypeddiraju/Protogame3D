@@ -8,6 +8,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Core/WindowContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/AABB3.hpp"
@@ -53,6 +54,9 @@ Game::~Game()
 
 void Game::StartUp()
 {
+	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
+	g_windowContext->HideMouse();
+
 	//Create the Camera and setOrthoView
 	m_mainCamera = new Camera();
 	m_mainCamera->SetColorTarget(nullptr);
@@ -136,25 +140,81 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case A_KEY:
 		{
 			//Handle left movement
-			m_camPosition.x -= 0.1f;
+			//m_camPosition.x -= 0.1f;
+
+			// compute a movement vector based on keyboard/gamepad input (your choice)
+			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
+
+			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			float speed = 0.1f; 
+
+			// compute actual local movement
+			localMovementDirection *= (speed); 
+
+			// move relative to the camera's orientation;
+			// note: try not doing this to get a better understanding of why it is necessary;  
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
+			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case W_KEY:
 		{
 			//Handle forward movement
-			m_camPosition.z += 0.1f;
+			//m_camPosition.z += 0.1f;
+
+			// compute a movement vector based on keyboard/gamepad input (your choice)
+			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetKVector();
+
+			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			float speed = 0.1f; 
+
+			// compute actual local movement
+			localMovementDirection *= (speed); 
+
+			// move relative to the camera's orientation;
+			// note: try not doing this to get a better understanding of why it is necessary;  
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
+			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case S_KEY:
 		{
 			//Handle backward movement
-			m_camPosition.z -= 0.1f;
+			//m_camPosition.z -= 0.1f;
+
+			// compute a movement vector based on keyboard/gamepad input (your choice)
+			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetKVector() * -1.f;
+
+			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			float speed = 0.1f; 
+
+			// compute actual local movement
+			localMovementDirection *= (speed); 
+
+			// move relative to the camera's orientation;
+			// note: try not doing this to get a better understanding of why it is necessary;  
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
+			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case D_KEY:
 		{
 			//Handle right movement
-			m_camPosition.x += 0.1f;
+			//m_camPosition.x += 0.1f;
+
+			// compute a movement vector based on keyboard/gamepad input (your choice)
+			Vec3 localMovementDirection = m_mainCamera->m_cameraModel.GetIVector();
+
+			// figure out how fast we're going (again, based on input - have at least a walk/run option)
+			float speed = 0.1f; 
+
+			// compute actual local movement
+			localMovementDirection *= (speed); 
+
+			// move relative to the camera's orientation;
+			// note: try not doing this to get a better understanding of why it is necessary;  
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.TransformVector3D( localMovementDirection); 
+			m_camPosition += worldMovementDirection; 
 		}
 		break;
 		case F4_KEY:
@@ -178,8 +238,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Fire event
 			g_eventSystem->FireEvent("TestEvent");
 			break;
-		}
-		case F7_KEY:
+		}		case F7_KEY:
 		{
 			//Quit Debug
 			g_eventSystem->FireEvent("Quit");
@@ -249,7 +308,8 @@ void Game::Render() const
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
-	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_camPosition, m_rotationOrder ); 
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
+	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 
 	m_mainCamera->UpdateUniformBuffer(g_renderContext);
@@ -314,6 +374,7 @@ void Game::PostRender()
 
 void Game::Update( float deltaTime )
 {
+	UpdateMouseInputs(deltaTime);
 
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
@@ -328,16 +389,19 @@ void Game::Update( float deltaTime )
 	m_animTime += deltaTime;
 	
 	//Update the camera's transform
-	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_camPosition, m_rotationOrder ); 
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
+	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 	
 	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
 
 	// Set the cube to rotate around y (which is up currently),
 	// and move the object to the left by 5 units (-x)
-	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, 3.0f * currentTime, 0.0f), Vec3(-5.0f, 0.0f, 0.0f), m_rotationOrder ); 
+	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, 3.0f * currentTime, 0.0f), m_rotationOrder ); 
+	m_cubeTransform = Matrix44::SetTranslation3D( Vec3(-5.0f, 0.0f, 0.0f), m_cubeTransform);
 
-	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -2.0f * currentTime, 0.0f), Vec3(5.0f, 0.0f, 0.0f) ); 
+	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -2.0f * currentTime, 0.0f) ); 
+	m_sphereTransform = Matrix44::SetTranslation3D( Vec3(5.0f, 0.0f, 0.0f), m_sphereTransform);
 
 	CheckCollisions();
 
@@ -391,4 +455,41 @@ bool Game::IsAlive()
 {
 	//Check if alive
 	return m_isGameAlive;
+}
+
+void Game::UpdateMouseInputs(float deltaTime)
+{
+	//Get pitch and yaw from mouse
+	IntVec2 mouseRelativePos = g_windowContext->GetClientMouseRelativeMovement();
+	Vec2 mouse = Vec2((float)mouseRelativePos.x, (float)mouseRelativePos.y);
+
+	// we usually want to scale the pixels so we can think of it
+	// as a rotational velocity;  Work with these numbers until 
+	// it feels good to you; 
+	Vec2 scalingFactor = Vec2( 10.f, 10.f ); 
+	Vec2 turnSpeed = mouse * scalingFactor; 
+
+	// y mouse movement would corresond to rotation around right (x for us)
+	// and x mouse movement corresponds with movement around up (y for us)
+	m_camEuler -= deltaTime * Vec3( turnSpeed.y, turnSpeed.x, 0.0f ); 
+
+	// Let's fix our "pitch", or rotation around right to be limited to -85 to 85 degrees (no going upside down)
+	m_camEuler.x = Clamp( m_camEuler.x, -85.0f, 85.0f );
+
+	// Next, let's keep the turning as between 0 and 360 (some people prefer -180.0f to 180.0f)
+	// either way, we just want to keep it a single revolution
+	// Note: modf does not correctly mod negative numbers (it'll ignore the sign and mod them as if 
+	// they were positive), so I write a special mod function to take this into account;  
+	//m_camEuler.y = Modf( m_camEuler.y, 360.0f ); 
+
+	// Awesome, I now have my euler, let's construct a matrix for it;
+	// this gives us our current camera's orientation.  we will 
+	// use this to translate our local movement to a world movement 
+	Matrix44 camMatrix = Matrix44::MakeFromEuler( m_camEuler); 
+
+	//Test implementation
+	//m_camEuler.y -= static_cast<float>(mouseRelativePos.x);
+	//m_camEuler.x -= static_cast<float>(mouseRelativePos.y);
+
+
 }

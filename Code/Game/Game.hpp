@@ -39,6 +39,7 @@ public:
 	void								Render() const;
 	void								PostRender();
 	void								Update( float deltaTime );
+	void								UpdateMouseInputs(float deltaTime);
 	void								UpdateCamera( float deltaTime );
 	void								ClearGarbageEntities();
 	void								CheckXboxInputs();
