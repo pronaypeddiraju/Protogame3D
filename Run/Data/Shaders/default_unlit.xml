@@ -21,6 +21,8 @@
                     dst_color, inv_dst_color, dst_alpha, inv_dst_alpha, constant -->
       <blend>
          <!-- setting this to "opaque".  We usually don't render alpha if we're writing depth -->
+         <!-- is this a custom mode? If not we will just go with the default settings for this shader -->
+         <mode customMode = "true"/>
          <color op="add" src="one" dst="zero" /> 
          <alpha op="add" src="inv_dst_alpha" dst="one" />  
          <!-- color mode="opaque" / -->
