@@ -54,6 +54,9 @@ Game::~Game()
 
 void Game::StartUp()
 {
+	IntVec2 clientCenter = g_windowContext->GetClientCenter();
+	g_windowContext->SetClientMousePosition(clientCenter);
+
 	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
 	g_windowContext->HideMouse();
 
