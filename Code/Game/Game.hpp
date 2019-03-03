@@ -71,6 +71,7 @@ public:
 
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
+	Camera*								m_debug2DCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
 	
 	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View

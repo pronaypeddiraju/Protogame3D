@@ -19,6 +19,7 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
 #include "Engine/Renderer/CPUMesh.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
@@ -68,14 +69,16 @@ void Game::StartUp()
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget(nullptr);
 
-	//m_devConsoleCamera->SetOrthoView(Vec2(-10.f, -10.f), Vec2(10.f, 10.f));
-
 	//Set Projection Perspective for new Cam
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
-	
 	//m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
+
+	//Create Debug render camera
+	m_debug2DCamera = new Camera();
+	m_debug2DCamera->SetColorTarget(nullptr);
+	g_debugRenderer->Set2DCamera(m_debug2DCamera);
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
@@ -228,6 +231,9 @@ void Game::Shutdown()
 	delete m_devConsoleCamera;
 	m_devConsoleCamera = nullptr;
 
+	delete m_debug2DCamera;
+	m_debug2DCamera = nullptr;
+
 	delete m_cube;
 	m_cube = nullptr;
 
@@ -275,6 +281,10 @@ void Game::Render() const
 	//Setup what we are rendering to
 	m_mainCamera->SetColorTarget(colorTargetView);
 	m_devConsoleCamera->SetColorTarget(colorTargetView);
+	m_debug2DCamera->SetColorTarget(colorTargetView);
+	int screenWidth = colorTargetView->m_width;
+	int screenHeight = colorTargetView->m_height;
+	m_debug2DCamera->SetOrthoView(Vec2(-screenWidth * 0.5f, -screenHeight * 0.5f), Vec2(screenWidth * 0.5f, screenHeight * 0.5f));
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
@@ -327,6 +337,12 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=25");
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
+
+	Camera* debugCamera = &g_debugRenderer->Get2DCamera();
+	g_renderContext->BeginCamera(*debugCamera);
+	DebugRenderOptionsT options;
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f));
+	g_renderContext->EndCamera();
 
 	if(g_devConsole->IsOpen())
 	{	

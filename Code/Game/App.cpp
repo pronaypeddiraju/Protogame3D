@@ -1,15 +1,16 @@
 //------------------------------------------------------------------------------------------------------------------------------
 #include "Game/App.hpp"
 //Engine Systems
-#include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
-#include "Engine/Core/XMLUtils/XMLUtils.hpp"
-#include "Engine/Core/NamedStrings.hpp"
-#include "Engine/Core/Time.hpp"
-#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
+#include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Engine/Core/XMLUtils/XMLUtils.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 //Game Systems
 #include "Game/Game.hpp"
 
@@ -73,6 +74,9 @@ void App::StartUp()
 	//create the networking system
 	//g_networkSystem = new NetworkSystem();
 
+	g_debugRenderer = new DebugRender();
+	g_debugRenderer->Startup(g_renderContext);
+
 	m_game = new Game();
 	m_game->StartUp();
 	
@@ -97,6 +101,9 @@ void App::ShutDown()
 
 	delete g_eventSystem;
 	g_eventSystem = nullptr;
+
+	delete g_debugRenderer;
+	g_debugRenderer = nullptr;
 }
 
 void App::RunFrame()
