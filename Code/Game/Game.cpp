@@ -341,7 +341,11 @@ void Game::Render() const
 	Camera* debugCamera = &g_debugRenderer->Get2DCamera();
 	g_renderContext->BeginCamera(*debugCamera);
 	DebugRenderOptionsT options;
+	options.mode = DEBUG_RENDER_ALWAYS;
+	options.beginColor = Rgba::RED;
 	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f));
+	options.beginColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f));
 	g_renderContext->EndCamera();
 
 	if(g_devConsole->IsOpen())
