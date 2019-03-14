@@ -141,7 +141,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Handle left movement
 			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
 			float speed = 0.1f; 
-			worldMovementDirection *= (speed); 
+			worldMovementDirection *= (speed);
 
 			m_camPosition += worldMovementDirection; 
 		}
@@ -180,7 +180,8 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Set volume back to 1
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 1.0f);
-			//Unsub test
+
+			//Unsubscribe test event
 			g_eventSystem->UnsubscribeEventCallBackFn("TestEvent", TestEvent);
 			break;
 		}
@@ -188,6 +189,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Set volume to 0
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 0.0f);
+			
 			//Help Debug
 			g_eventSystem->FireEvent("Help");
 			break;
@@ -273,7 +275,7 @@ void Game::Render() const
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
-	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 
@@ -335,10 +337,32 @@ void Game::Render() const
 
 void Game::DebugRender() const
 {
+	Camera& debugCamera3D = *m_mainCamera;
+	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
+	g_renderContext->BeginCamera(debugCamera3D);
+
+	//-----------------------------------------------------------------------------
+	// 3D DEBUG RENDERS
+	//-----------------------------------------------------------------------------
+	//Setup Debug Options
+	DebugRenderOptionsT options3D;
+	options3D.space = DEBUG_RENDER_WORLD;
+	options3D.beginColor = Rgba::GREEN;
+
+	//Make a 3D point in the world
+	g_debugRenderer->DebugRenderPoint(*m_mainCamera, options3D, Vec3(-10.0f, 0.0f, 0.0f), m_textureTest);
+
+	g_renderContext->EndCamera();
+	//-----------------------------------------------------------------------------
+
 	Camera& debugCamera = g_debugRenderer->Get2DCamera();
 	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 	g_renderContext->BeginCamera(debugCamera);
-	
+
+	//-----------------------------------------------------------------------------
+	// 2D DEBUG RENDERS
+	//-----------------------------------------------------------------------------
+
 	//Setup Debug Options
 	DebugRenderOptionsT options;
 	options.mode = DEBUG_RENDER_ALWAYS;
@@ -385,7 +409,7 @@ void Game::Update( float deltaTime )
 	m_animTime += deltaTime;
 	
 	//Update the camera's transform
-	Matrix44 camTransform = Matrix44::MakeFromEuler( m_camEuler, m_rotationOrder ); 
+	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 	
@@ -467,10 +491,12 @@ void Game::UpdateMouseInputs(float deltaTime)
 
 	// y mouse movement would corresond to rotation around right (x for us)
 	// and x mouse movement corresponds with movement around up (y for us)
-	m_camEuler -= deltaTime * Vec3( turnSpeed.y, turnSpeed.x, 0.0f ); 
+	Vec3 camEuler = m_mainCamera->GetEuler();
+	camEuler -= deltaTime * Vec3( turnSpeed.y, turnSpeed.x, 0.0f ); 
+	m_mainCamera->SetEuler(camEuler);
 
 	// Let's fix our "pitch", or rotation around right to be limited to -85 to 85 degrees (no going upside down)
-	m_camEuler.x = Clamp( m_camEuler.x, -85.0f, 85.0f );
+	camEuler.x = Clamp( camEuler.x, -85.0f, 85.0f );
 
 	// Next, let's keep the turning as between 0 and 360 (some people prefer -180.0f to 180.0f)
 	// either way, we just want to keep it a single revolution
@@ -481,7 +507,7 @@ void Game::UpdateMouseInputs(float deltaTime)
 	// Awesome, I now have my euler, let's construct a matrix for it;
 	// this gives us our current camera's orientation.  we will 
 	// use this to translate our local movement to a world movement 
-	Matrix44 camMatrix = Matrix44::MakeFromEuler( m_camEuler); 
+	Matrix44 camMatrix = Matrix44::MakeFromEuler( camEuler ); 
 
 	//Test implementation
 	//m_camEuler.y -= static_cast<float>(mouseRelativePos.x);
