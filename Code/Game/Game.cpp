@@ -4,18 +4,15 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
-#include "Engine/Core/Image.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Core/WindowContext.hpp"
-#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/AABB3.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Matrix44.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
 #include "Engine/Renderer/CPUMesh.hpp"
@@ -24,7 +21,6 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/Shader.hpp"
-#include "Engine/Renderer/TextureView.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -74,11 +70,6 @@ void Game::StartUp()
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
 	//m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
-
-	//Create Debug render camera
-	m_debug2DCamera = new Camera();
-	m_debug2DCamera->SetColorTarget(nullptr);
-	g_debugRenderer->Set2DCamera(m_debug2DCamera);
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
@@ -144,6 +135,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case F1_KEY:
 		case F2_KEY:
 		case F3_KEY:
+		break;
 		case A_KEY:
 		{
 			//Handle left movement
@@ -231,9 +223,6 @@ void Game::Shutdown()
 	delete m_devConsoleCamera;
 	m_devConsoleCamera = nullptr;
 
-	delete m_debug2DCamera;
-	m_debug2DCamera = nullptr;
-
 	delete m_cube;
 	m_cube = nullptr;
 
@@ -281,10 +270,6 @@ void Game::Render() const
 	//Setup what we are rendering to
 	m_mainCamera->SetColorTarget(colorTargetView);
 	m_devConsoleCamera->SetColorTarget(colorTargetView);
-	m_debug2DCamera->SetColorTarget(colorTargetView);
-	int screenWidth = colorTargetView->m_width;
-	int screenHeight = colorTargetView->m_height;
-	m_debug2DCamera->SetOrthoView(Vec2(-screenWidth * 0.5f, -screenHeight * 0.5f), Vec2(screenWidth * 0.5f, screenHeight * 0.5f));
 
 	// Move the camera to where it is in the scene
 	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
@@ -338,22 +323,43 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
 
-	Camera* debugCamera = &g_debugRenderer->Get2DCamera();
-	g_renderContext->BeginCamera(*debugCamera);
-	DebugRenderOptionsT options;
-	options.mode = DEBUG_RENDER_ALWAYS;
-	options.beginColor = Rgba::RED;
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f));
-	options.beginColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f));
-	g_renderContext->EndCamera();
-
+	DebugRender();
+	
 	if(g_devConsole->IsOpen())
 	{	
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}
 
 	
+}
+
+void Game::DebugRender() const
+{
+	Camera& debugCamera = g_debugRenderer->Get2DCamera();
+	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
+	g_renderContext->BeginCamera(debugCamera);
+	
+	//Setup Debug Options
+	DebugRenderOptionsT options;
+	options.mode = DEBUG_RENDER_ALWAYS;
+	options.beginColor = Rgba::RED;
+
+	//Make 2D Point on screen
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f));
+	//Make 2D Point at screen center
+	options.beginColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f));
+
+	ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
+	options.beginColor = Rgba::YELLOW;
+	//Draw a line in 2D screen space
+	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 2.f);
+
+	//Draw a quad in 2D screen space
+	options.beginColor = Rgba::GREEN;
+	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-150.f, -150.f), Vec2(-100.f, -100.f)));
+
+	g_renderContext->EndCamera();
 }
 
 void Game::PostRender()

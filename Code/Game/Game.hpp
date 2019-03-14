@@ -37,6 +37,7 @@ public:
 	void								Shutdown();
 
 	void								Render() const;
+	void								DebugRender() const;
 	void								PostRender();
 	void								Update( float deltaTime );
 	void								UpdateMouseInputs(float deltaTime);
