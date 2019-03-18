@@ -291,19 +291,12 @@ void Game::Render() const
 
 	std::vector<Vertex_PCU> triangleVerts;
 	
-	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, -1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
-	triangleVerts.push_back(Vertex_PCU(Vec3(1.f, -1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
-	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, 1.f, 0.f), Rgba::WHITE, Vec2::ZERO));
+	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, -1.f, 0.f), Rgba::RED, Vec2::ZERO));
+	triangleVerts.push_back(Vertex_PCU(Vec3(1.f, -1.f, 0.f), Rgba::GREEN, Vec2::ZERO));
+	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, 1.f, 0.f), Rgba::BLUE, Vec2::ZERO));
 
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawVertexArray(triangleVerts);
-
-	/*
-	//Render a quad
-	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	g_renderContext->SetModelMatrix(m_cubeTransform);
-	g_renderContext->DrawMesh(m_quad);
-	*/
 
 	//Render the cube
 	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
@@ -350,7 +343,7 @@ void Game::DebugRender() const
 	options3D.beginColor = Rgba::GREEN;
 
 	//Make a 3D point in the world
-	g_debugRenderer->DebugRenderPoint(*m_mainCamera, options3D, Vec3(-10.0f, 0.0f, 0.0f), m_textureTest);
+	g_debugRenderer->DebugRenderPoint(*m_mainCamera, options3D, Vec3(-10.0f, 0.0f, 0.0f), m_textureTest, 0.2f);
 
 	g_renderContext->EndCamera();
 	//-----------------------------------------------------------------------------
