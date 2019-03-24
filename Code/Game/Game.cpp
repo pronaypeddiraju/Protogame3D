@@ -129,6 +129,28 @@ void Game::SetStartupDebugRenderObjects()
 	options.endColor = Rgba::RED;
 	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-150.f, -150.f), Vec2(-100.f, -100.f)), 20.f);
 
+	//Textured Quad
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::RED;
+	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-200.f, -200.f), Vec2(-150.f, -150.f)), 20.f, m_textureTest);
+
+	//Disc2D
+	options.beginColor = Rgba::DARK_GREY;
+	options.endColor = Rgba::ORANGE;
+	g_debugRenderer->DebugRenderDisc2D(options, Disc2D(Vec2(100.f, 100.f), 25.f), 10.f);
+
+	//Ring2D
+	options.beginColor = Rgba::ORANGE;
+	options.endColor = Rgba::DARK_GREY;
+	g_debugRenderer->DebugRenderRing2D(options, Disc2D(Vec2(100.f, 100.f), 25.f), 10.f, 10.f);
+
+
+	//Wired Quad
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderWireQuad2D(options, AABB2(Vec2(100.f, -100.f), Vec2(150.f, -50.f)), 20.f);
+
+
 	//------------------------------------------------------------------------------------------------------------------------------
 	// 3D Objects
 	//------------------------------------------------------------------------------------------------------------------------------
@@ -136,13 +158,20 @@ void Game::SetStartupDebugRenderObjects()
 	DebugRenderOptionsT options3D;
 	options3D.space = DEBUG_RENDER_WORLD;
 	options3D.beginColor = Rgba::GREEN;
+	options3D.endColor = Rgba::RED;
 
 	//make a 3D point
-	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 5.0f, 0.2f);
+	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 10.0f, 0.2f);
 
 	//Make a 3D textured point
 	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::WHITE;
 	g_debugRenderer->DebugRenderPoint(options3D, Vec3(-10.0f, 0.0f, 0.0f), 20.f, 1.f, m_textureTest);
+
+	//Make a line in 3D
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::BLACK;
+	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 0.f), Vec3(10.f, 0.f, 10.f), 2000.f);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
