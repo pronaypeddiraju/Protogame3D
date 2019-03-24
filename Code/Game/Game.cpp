@@ -13,6 +13,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Matrix44.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
 #include "Engine/Renderer/CPUMesh.hpp"
@@ -21,6 +22,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -165,7 +167,7 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.endColor = Rgba::RED;
 
 	//make a 3D point
-	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 10.0f, 0.2f);
+	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 10.0f );
 
 	//Make a 3D textured point
 	options3D.beginColor = Rgba::WHITE;
@@ -175,7 +177,7 @@ void Game::SetStartupDebugRenderObjects()
 	//Make a line in 3D
 	options3D.beginColor = Rgba::WHITE;
 	options3D.endColor = Rgba::BLACK;
-	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 0.f), Vec3(10.f, 0.f, 10.f), 2000.f);
+	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 5.f), Vec3(10.f, 0.f, 10.f), 2000.f);
 
 	//Make a sphere
 	options3D.beginColor = Rgba::WHITE;
