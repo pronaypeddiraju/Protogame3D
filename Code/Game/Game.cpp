@@ -170,29 +170,29 @@ void Game::SetStartupDebugRenderObjects()
 	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 10.0f );
 
 	//Make a 3D textured point
-	options3D.beginColor = Rgba::WHITE;
-	options3D.endColor = Rgba::WHITE;
+	options3D.beginColor = Rgba::BLUE;
+	options3D.endColor = Rgba::RED;
 	g_debugRenderer->DebugRenderPoint(options3D, Vec3(-10.0f, 0.0f, 0.0f), 20.f, 1.f, m_textureTest);
 
 	//Make a line in 3D
-	options3D.beginColor = Rgba::WHITE;
+	options3D.beginColor = Rgba::BLUE;
 	options3D.endColor = Rgba::BLACK;
 	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 5.f), Vec3(10.f, 0.f, 10.f), 2000.f);
 
 	//Make a sphere
-	options3D.beginColor = Rgba::WHITE;
-	options3D.endColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, 1.f, 0.f), 1.f, 5.f, nullptr);
+	options3D.beginColor = Rgba::RED;
+	options3D.endColor = Rgba::BLACK;
+	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, 3.f, 0.f), 1.f, 10.f, nullptr);
 
 	//Make a sphere
-	options3D.beginColor = Rgba::WHITE;
+	options3D.beginColor = Rgba::GREEN;
 	options3D.endColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, -1.f, 0.f), 1.f, 200.f, m_sphereTexture);
+	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, -3.f, 0.f), 1.f, 200.f, m_sphereTexture);
 
 	//Make a cube
 	options3D.beginColor = Rgba::WHITE;
 	options3D.endColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderBox(options3D, AABB3(Vec3(-0.5f, -1.f, -0.5f), Vec3(0.5f, -0.f, 0.5f)), 20.f);	
+	g_debugRenderer->DebugRenderBox(options3D, AABB3(Vec3(-4.5f, -1.5f, -0.5f), Vec3(-3.5f, -0.5f, 0.5f)), 20.f);	
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
