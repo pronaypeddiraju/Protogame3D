@@ -142,8 +142,12 @@ void Game::SetStartupDebugRenderObjects()
 	//Ring2D
 	options.beginColor = Rgba::ORANGE;
 	options.endColor = Rgba::DARK_GREY;
-	g_debugRenderer->DebugRenderRing2D(options, Disc2D(Vec2(100.f, 100.f), 25.f), 10.f, 10.f);
+	g_debugRenderer->DebugRenderRing2D(options, Disc2D(Vec2(100.f, 100.f), 25.f), 10.f, 5.f);
 
+	//Ring2D
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderRing2D(options, Disc2D(Vec2(150.f, 100.f), 2000.f), 10.f, 1.f);
 
 	//Wired Quad
 	options.beginColor = Rgba::WHITE;
@@ -172,6 +176,21 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.beginColor = Rgba::WHITE;
 	options3D.endColor = Rgba::BLACK;
 	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 0.f), Vec3(10.f, 0.f, 10.f), 2000.f);
+
+	//Make a sphere
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, 1.f, 0.f), 1.f, 5.f, nullptr);
+
+	//Make a sphere
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, -1.f, 0.f), 1.f, 200.f, m_sphereTexture);
+
+	//Make a cube
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderBox(options3D, AABB3(Vec3(-0.5f, -1.f, -0.5f), Vec3(0.5f, -0.f, 0.5f)), 20.f);	
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
