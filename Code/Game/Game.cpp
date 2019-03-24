@@ -105,17 +105,20 @@ void Game::SetStartupDebugRenderObjects()
 	//Setup Debug Options
 	DebugRenderOptionsT options;
 	options.mode = DEBUG_RENDER_ALWAYS;
-	options.beginColor = Rgba::RED;
+	options.beginColor = Rgba::BLUE;
+	options.endColor = Rgba::RED;
 
 	//Make 2D Point on screen
 	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f), 5.0f);
 	//Make 2D Point at screen center
-	options.beginColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f), 0.f);
+	options.beginColor = Rgba::BLUE;
+	options.endColor = Rgba::BLACK;
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f), 10.f);
 
 	options.beginColor = Rgba::YELLOW;
+	options.endColor = Rgba::RED;
 	//Draw a line in 2D screen space
-	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 2.f);
+	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 20.f);
 
 }
 
@@ -426,7 +429,6 @@ void Game::PostRender()
 void Game::Update( float deltaTime )
 {
 	UpdateMouseInputs(deltaTime);
-	g_debugRenderer->Update(deltaTime);
 
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
