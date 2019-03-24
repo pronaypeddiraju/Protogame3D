@@ -51,12 +51,33 @@ Game::~Game()
 
 void Game::StartUp()
 {
+	SetupMouseData();
+	SetupCameras();
+
+	GetandSetShaders();
+	LoadGameTextures();
+
+	g_devConsole->PrintString(Rgba::BLUE, "this is a test string");
+	g_devConsole->PrintString(Rgba::RED, "this is also a test string");
+	g_devConsole->PrintString(Rgba::GREEN, "damn this dev console lit!");
+	g_devConsole->PrintString(Rgba::WHITE, "Last thing I printed");
+
+	g_eventSystem->SubscribeEventCallBackFn("TestEvent", TestEvent);
+
+	CreateInitialMeshes();
+}
+
+void Game::SetupMouseData()
+{
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
 
 	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
 	g_windowContext->HideMouse();
+}
 
+void Game::SetupCameras()
+{
 	//Create the Camera and setOrthoView
 	m_mainCamera = new Camera();
 	m_mainCamera->SetColorTarget(nullptr);
@@ -73,41 +94,29 @@ void Game::StartUp()
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 
-	g_devConsole->PrintString(Rgba::BLUE, "this is a test string");
-	g_devConsole->PrintString(Rgba::RED, "this is also a test string");
-	g_devConsole->PrintString(Rgba::GREEN, "damn this dev console lit!");
-	g_devConsole->PrintString(Rgba::WHITE, "Last thing I printed");
+}
 
-	g_eventSystem->SubscribeEventCallBackFn("TestEvent", TestEvent);
+void Game::SetStartupDebugRenderObjects()
+{
+	ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
+	//Setup debug render client data
+	g_debugRenderer->SetClientDimensions( ctv->m_height, ctv->m_width );
 
-	//Get the Shader
-	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_xmlShaderPath);
-	m_shader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
+	//Setup Debug Options
+	DebugRenderOptionsT options;
+	options.mode = DEBUG_RENDER_ALWAYS;
+	options.beginColor = Rgba::RED;
 
-	//Get the test texture
-	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
-	m_boxTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_boxTexturePath);
-	m_sphereTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_sphereTexturePath);
+	//Make 2D Point on screen
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f), 5.0f);
+	//Make 2D Point at screen center
+	options.beginColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f), 0.f);
 
-	//Meshes for A4
-	CPUMesh mesh;
-	/*
-	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)));
-	m_quad = new GPUMesh(g_renderContext);
-	m_quad->CreateFromCPUMesh(&mesh, GPU_MEMORY_USAGE_STATIC);
-	*/
+	options.beginColor = Rgba::YELLOW;
+	//Draw a line in 2D screen space
+	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 2.f);
 
-	// create a cube (centered at zero, with sides 2 length)
-	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.5f, 0.5f, 0.5f)) ); 
-	m_cube = new GPUMesh( g_renderContext ); 
-	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
-	
-
-	// create a sphere, cenetered at zero, with 
-	mesh.Clear();
-	CPUMeshAddUVSphere( &mesh, Vec3::ZERO, 1.0f );  
-	m_sphere = new GPUMesh( g_renderContext ); 
-	m_sphere->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC );
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -317,8 +326,7 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=25");
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
-
-	DebugRender();
+	
 	
 	if(g_devConsole->IsOpen())
 	{	
@@ -328,8 +336,9 @@ void Game::Render() const
 	
 }
 
-void Game::DebugRender() const
+void Game::DebugRenderToScreen() const
 {
+	/*
 	Camera& debugCamera3D = *m_mainCamera;
 	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 	g_renderContext->BeginCamera(debugCamera3D);
@@ -362,10 +371,10 @@ void Game::DebugRender() const
 	options.beginColor = Rgba::RED;
 
 	//Make 2D Point on screen
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f));
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f), 5.0f);
 	//Make 2D Point at screen center
 	options.beginColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f));
+	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f), 0.f);
 
 	ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
 	options.beginColor = Rgba::YELLOW;
@@ -377,17 +386,47 @@ void Game::DebugRender() const
 	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-150.f, -150.f), Vec2(-100.f, -100.f)));
 
 	g_renderContext->EndCamera();
+	*/
+
+	
+	Camera& debugCamera = g_debugRenderer->Get2DCamera();
+	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
+	g_renderContext->BeginCamera(debugCamera);
+	
+	g_debugRenderer->DebugRenderToScreen();
+
+	g_renderContext->EndCamera();
+	
+}
+
+void Game::DebugRenderToCamera() const
+{
+	g_renderContext->BeginCamera(*m_mainCamera);
+
+	g_debugRenderer->DebugRenderToCamera(m_mainCamera);
+
+	g_renderContext->EndCamera();
 }
 
 void Game::PostRender()
 {
 	//Debug bools
 	m_consoleDebugOnce = true;
+
+	if(!m_isDebugSetup)
+	{
+		SetStartupDebugRenderObjects();
+		m_isDebugSetup = true;
+	}
+
+	//All screen Debug information
+	DebugRenderToScreen();
 }
 
 void Game::Update( float deltaTime )
 {
 	UpdateMouseInputs(deltaTime);
+	g_debugRenderer->Update(deltaTime);
 
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
@@ -468,6 +507,45 @@ bool Game::IsAlive()
 {
 	//Check if alive
 	return m_isGameAlive;
+}
+
+void Game::CreateInitialMeshes()
+{
+
+	//Meshes for A4
+	CPUMesh mesh;
+	/*
+	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)));
+	m_quad = new GPUMesh(g_renderContext);
+	m_quad->CreateFromCPUMesh(&mesh, GPU_MEMORY_USAGE_STATIC);
+	*/
+
+	// create a cube (centered at zero, with sides 2 length)
+	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.5f, 0.5f, 0.5f)) ); 
+	m_cube = new GPUMesh( g_renderContext ); 
+	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
+
+
+																 // create a sphere, cenetered at zero, with 
+	mesh.Clear();
+	CPUMeshAddUVSphere( &mesh, Vec3::ZERO, 1.0f );  
+	m_sphere = new GPUMesh( g_renderContext ); 
+	m_sphere->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC );
+}
+
+void Game::LoadGameTextures()
+{
+	//Get the test texture
+	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
+	m_boxTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_boxTexturePath);
+	m_sphereTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_sphereTexturePath);
+}
+
+void Game::GetandSetShaders()
+{
+	//Get the Shader
+	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_xmlShaderPath);
+	m_shader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
 }
 
 void Game::UpdateMouseInputs(float deltaTime)

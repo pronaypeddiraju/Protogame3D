@@ -29,6 +29,14 @@ public:
 	
 	void								StartUp();
 	
+	void								SetupMouseData();
+	void								SetupCameras();
+	void								GetandSetShaders();
+	void								LoadGameTextures();
+	void								CreateInitialMeshes();
+	void								SetStartupDebugRenderObjects();
+
+
 	void								HandleKeyPressed( unsigned char keyCode );
 	void								HandleKeyReleased( unsigned char keyCode );
 	void								HandleCharacter( unsigned char charCode );
@@ -37,7 +45,8 @@ public:
 	void								Shutdown();
 
 	void								Render() const;
-	void								DebugRender() const;
+	void								DebugRenderToScreen() const;
+	void								DebugRenderToCamera() const;
 	void								PostRender();
 	void								Update( float deltaTime );
 	void								UpdateMouseInputs(float deltaTime);
@@ -51,6 +60,7 @@ private:
 	bool								m_isGameAlive = false;
 	bool								m_consoleDebugOnce = false;
 	bool								m_devConsoleSetup = false;
+	bool								m_isDebugSetup = false;
 
 public:
 	SoundID								m_testAudioID = NULL;
@@ -72,7 +82,6 @@ public:
 
 	Camera*								m_mainCamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
-	Camera*								m_debug2DCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
 	
 	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View
