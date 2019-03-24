@@ -85,8 +85,6 @@ void App::StartUp()
 
 void App::ShutDown()
 {
-	m_game->Shutdown();
-
 	delete g_renderContext;
 	g_renderContext = nullptr;
 
@@ -104,6 +102,8 @@ void App::ShutDown()
 
 	delete g_debugRenderer;
 	g_debugRenderer = nullptr;
+
+	m_game->Shutdown();
 }
 
 void App::RunFrame()

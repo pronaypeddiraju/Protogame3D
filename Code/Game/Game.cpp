@@ -108,6 +108,10 @@ void Game::SetStartupDebugRenderObjects()
 	options.beginColor = Rgba::BLUE;
 	options.endColor = Rgba::RED;
 
+	//------------------------------------------------------------------------------------------------------------------------------
+	// 2D Objects
+	//------------------------------------------------------------------------------------------------------------------------------
+
 	//Make 2D Point on screen
 	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f), 5.0f);
 	//Make 2D Point at screen center
@@ -120,6 +124,25 @@ void Game::SetStartupDebugRenderObjects()
 	//Draw a line in 2D screen space
 	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 20.f);
 
+	//Draw a quad in 2D screen space
+	options.beginColor = Rgba::GREEN;
+	options.endColor = Rgba::RED;
+	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-150.f, -150.f), Vec2(-100.f, -100.f)), 20.f);
+
+	//------------------------------------------------------------------------------------------------------------------------------
+	// 3D Objects
+	//------------------------------------------------------------------------------------------------------------------------------
+
+	DebugRenderOptionsT options3D;
+	options3D.space = DEBUG_RENDER_WORLD;
+	options3D.beginColor = Rgba::GREEN;
+
+	//make a 3D point
+	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 5.0f, 0.2f);
+
+	//Make a 3D textured point
+	options3D.beginColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderPoint(options3D, Vec3(-10.0f, 0.0f, 0.0f), 20.f, 1.f, m_textureTest);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -329,7 +352,8 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=25");
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
-	
+
+	DebugRenderToCamera();
 	
 	if(g_devConsole->IsOpen())
 	{	
@@ -404,9 +428,13 @@ void Game::DebugRenderToScreen() const
 
 void Game::DebugRenderToCamera() const
 {
-	g_renderContext->BeginCamera(*m_mainCamera);
+	Camera& debugCamera3D = *m_mainCamera;
+	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 
-	g_debugRenderer->DebugRenderToCamera(m_mainCamera);
+	g_renderContext->BeginCamera(debugCamera3D);
+	
+	g_debugRenderer->Setup3DCamera(&debugCamera3D);
+	g_debugRenderer->DebugRenderToCamera();
 
 	g_renderContext->EndCamera();
 }
