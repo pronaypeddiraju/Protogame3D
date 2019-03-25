@@ -43,7 +43,7 @@ Game::Game()
 
 	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
 	g_devConsole->SetBitmapFont(*m_squirrelFont);
-
+	g_debugRenderer->SetDebugFont(m_squirrelFont);
 }
 
 Game::~Game()
@@ -217,6 +217,12 @@ void Game::SetStartupDebugRenderObjects()
 	quad = AABB2(Vec3(-1.f, -1.f, 0.f), Vec3(1.f, 1.f, 0.f));
 	position = Vec3(5.f, 2.f, 1.f);
 	g_debugRenderer->DebugRenderQuad(options3D, quad, position, 2000.f, m_textureTest);
+
+	//Make text
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::RED;
+	const char* text = "This is some text";
+	g_debugRenderer->DebugRenderTextv(options3D, Vec3(1.f, 1.f, 1.f), Vec2(1.f, 1.f), text, 0.1f, 20000.f);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
