@@ -61,6 +61,7 @@ private:
 	bool								m_consoleDebugOnce = false;
 	bool								m_devConsoleSetup = false;
 	bool								m_isDebugSetup = false;
+	float								m_cameraSpeed = 0.3f; 
 
 public:
 	SoundID								m_testAudioID = NULL;

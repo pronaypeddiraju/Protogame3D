@@ -49,6 +49,7 @@ Game::Game()
 Game::~Game()
 {
 	m_isGameAlive = false;
+	Shutdown();
 }
 
 void Game::StartUp()
@@ -156,6 +157,12 @@ void Game::SetStartupDebugRenderObjects()
 	options.endColor = Rgba::WHITE;
 	g_debugRenderer->DebugRenderWireQuad2D(options, AABB2(Vec2(100.f, -100.f), Vec2(150.f, -50.f)), 20.f);
 
+	//Text
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::RED;
+	const char* text2D = "Read me bruh";
+	g_debugRenderer->DebugRenderText2D(options, Vec2(-100.f, 200.f), Vec2(100.f, 200.f), text2D, DEFAULT_TEXT_HEIGHT, 20.f);
+
 	//------------------------------------------------------------------------------------------------------------------------------
 	// 3D Objects
 	//------------------------------------------------------------------------------------------------------------------------------
@@ -222,7 +229,13 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.beginColor = Rgba::WHITE;
 	options3D.endColor = Rgba::RED;
 	const char* text = "This is some text";
-	g_debugRenderer->DebugRenderTextv(options3D, Vec3(1.f, 1.f, 1.f), Vec2(1.f, 1.f), text, 0.1f, 20000.f);
+	g_debugRenderer->DebugRenderText3D(options3D, Vec3(1.f, 1.f, 1.f), Vec2(1.f, 1.f), text, 0.1f, 20000.f);
+
+	//Make text non billboarded
+	options3D.beginColor = Rgba::BLUE;
+	options3D.endColor = Rgba::RED;
+	const char* textNB = "Billboard this";
+	g_debugRenderer->DebugRenderText3D(options3D, Vec3(1.f, 0.5f, 0.f), Vec2(-1.f, 1.f), textNB, 0.2f, 20000.f, false);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
@@ -255,8 +268,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Handle left movement
 			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
-			float speed = 0.1f; 
-			worldMovementDirection *= (speed);
+			worldMovementDirection *= (m_cameraSpeed);
 
 			m_camPosition += worldMovementDirection; 
 		}
@@ -265,8 +277,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Handle forward movement
 			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector();
-			float speed = 0.1f; 
-			worldMovementDirection *= (speed); 
+			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
 		}
@@ -275,8 +286,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Handle backward movement
 			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector() * -1.f;
-			float speed = 0.1f; 
-			worldMovementDirection *= (speed); 
+			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
 		}
@@ -285,8 +295,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		{
 			//Handle right movement
 			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector();
-			float speed = 0.1f; 
-			worldMovementDirection *= (speed); 
+			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
 		}
