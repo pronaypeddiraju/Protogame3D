@@ -156,11 +156,10 @@ void Game::SetStartupDebugRenderObjects()
 	options.endColor = Rgba::WHITE;
 	g_debugRenderer->DebugRenderWireQuad2D(options, AABB2(Vec2(100.f, -100.f), Vec2(150.f, -50.f)), 20.f);
 
-
 	//------------------------------------------------------------------------------------------------------------------------------
 	// 3D Objects
 	//------------------------------------------------------------------------------------------------------------------------------
-
+	
 	DebugRenderOptionsT options3D;
 	options3D.space = DEBUG_RENDER_WORLD;
 	options3D.beginColor = Rgba::GREEN;
@@ -183,23 +182,40 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.beginColor = Rgba::RED;
 	options3D.endColor = Rgba::BLACK;
 	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, 3.f, 0.f), 1.f, 10.f, nullptr);
-
+	
 	//Make a sphere
 	options3D.beginColor = Rgba::GREEN;
 	options3D.endColor = Rgba::WHITE;
 	g_debugRenderer->DebugRenderSphere(options3D, Vec3(0.f, -3.f, 0.f), 1.f, 200.f, m_sphereTexture);
-
+	
+	//Make a wire sphere
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderWireSphere(options3D, Vec3(0.f, -2.f, 0.f), 1.f, 200.f);
+	
 	//Make a cube
 	options3D.beginColor = Rgba::DARK_GREY;
 	options3D.endColor = Rgba::WHITE;
 	AABB3 cube = AABB3::UNIT_CUBE;
 	g_debugRenderer->DebugRenderBox(options3D, cube, Vec3(-5.f, -1.5f, 0.f), 20.f);
 
-	//Make a quad 3D
+	//Make a wire cube
+	options3D.beginColor = Rgba::DARK_GREY;
+	options3D.endColor = Rgba::WHITE;
+	g_debugRenderer->DebugRenderWireBox(options3D, cube, Vec3(-5.f, 1.5f, 0.f), 20.f);
+
+	//Make a quad 3D no billboard
 	options3D.beginColor = Rgba::WHITE;
 	options3D.endColor = Rgba::RED;
 	AABB2 quad = AABB2(Vec3(-1.f, -1.f, 0.f), Vec3(1.f, 1.f, 0.f));
 	Vec3 position = Vec3(3.f, 2.f, 1.f);
+	g_debugRenderer->DebugRenderQuad(options3D, quad, position, 2000.f, m_textureTest, false);
+
+	//Make a quad 3D 
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::RED;
+	quad = AABB2(Vec3(-1.f, -1.f, 0.f), Vec3(1.f, 1.f, 0.f));
+	position = Vec3(5.f, 2.f, 1.f);
 	g_debugRenderer->DebugRenderQuad(options3D, quad, position, 2000.f, m_textureTest);
 }
 
