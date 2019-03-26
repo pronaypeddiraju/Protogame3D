@@ -245,6 +245,22 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.endColor = Rgba::RED;
 	const char* textNB = "Billboard this";
 	g_debugRenderer->DebugRenderText3D(options3D, Vec3(1.f, 0.5f, 0.f), Vec2(-1.f, 1.f), textNB, 0.2f, 20000.f, false);
+
+	//------------------------------------------------------------------------------------------------------------------------------
+	//	LOG Objects
+	//------------------------------------------------------------------------------------------------------------------------------
+	//Setup Debug Options
+	options.mode = DEBUG_RENDER_ALWAYS;
+	options3D.beginColor = Rgba::BLUE;
+	options3D.endColor = Rgba::RED;
+	const char* debugText1 = "Debug Log Test";
+	g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 10.f);
+
+	//Setup Debug Options
+	options3D.beginColor = Rgba::WHITE;
+	options3D.endColor = Rgba::RED;
+	const char* debugText2 = "This is another Debug String";
+	g_debugRenderer->DebugAddToLog(options, debugText2, Rgba::GREEN, 20.f);
 }
 
 STATIC bool Game::TestEvent(EventArgs& args)
