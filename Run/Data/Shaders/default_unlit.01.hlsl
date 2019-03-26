@@ -15,9 +15,9 @@
 // inputs/outputs, so probably best to avoid that naming.
 struct vs_input_t 
 {
-   float3 position      : POSITION; 
-   float4 color         : COLOR; 
-   float2 uv            : TEXCOORD; 
+	float3 position      : POSITION; 
+	float4 color         : COLOR; 
+	float2 uv            : TEXCOORD; 
 }; 
 
 
@@ -37,14 +37,15 @@ struct vs_input_t
 //--------------------------------------------------------------------------------------
 cbuffer camera_constants : register(b2)
 {
-   float4x4 VIEW; 
-   float4x4 PROJECTION; 
+	float4x4 VIEW; 
+	float4x4 PROJECTION; 
 };
 
 //--------------------------------------------------------------------------------------
 cbuffer model_constants : register(b3)
 {
-   float4x4 MODEL;  // LOCAL_TO_WORLD
+	float4x4 MODEL;  // LOCAL_TO_WORLD
+	float4 TINT;	//Set object tint 
 }
 
 //--------------------------------------------------------------------------------------
@@ -66,41 +67,41 @@ cbuffer model_constants : register(b3)
 Texture2D<float4> tAlbedo : register(t0); // texutre I'm using for albedo (color) information
 SamplerState sAlbedo : register(s0);      // sampler I'm using for the Albedo texture
 
-//--------------------------------------------------------------------------------------
-// Programmable Shader Stages
-//--------------------------------------------------------------------------------------
+										  //--------------------------------------------------------------------------------------
+										  // Programmable Shader Stages
+										  //--------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------
-// for passing data from vertex to fragment (v-2-f)
+										  //--------------------------------------------------------------------------------------
+										  // for passing data from vertex to fragment (v-2-f)
 struct v2f_t 
 {
-   float3 position : SV_POSITION; 
-   float4 color : COLOR; 
-   float2 uv : UV; 
+	float4 position : SV_POSITION; 
+	float4 color : COLOR; 
+	float2 uv : UV; 
 }; 
 
 //--------------------------------------------------------------------------------------
 float RangeMap( float v, float inMin, float inMax, float outMin, float outMax ) 
 { 
-	return ( ( (v - inMin) * (outMax - outMin) / (inMax - inMin) ) + outMin);
+	return ( ( (v - inMin) * (outMax - outMin) / (inMax - inMin) ) + outMin); 
 }
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 v2f_t VertexFunction(vs_input_t input)
 {
-   v2f_t v2f = (v2f_t)0;
+	v2f_t v2f = (v2f_t)0;
 
-   float4 local_pos = float4( input.position, 1.0f ); 
-   float4 world_pos = mul( MODEL, local_pos ); // mul( MODEL, local_pos ); 
-   float4 view_pos = mul( VIEW, world_pos ); 
-   float4 clip_pos = mul( PROJECTION, view_pos ); 
+	float4 local_pos = float4( input.position, 1.0f ); 
+	float4 world_pos = mul( MODEL, local_pos );
+	float4 view_pos = mul( VIEW, world_pos ); 
+	float4 clip_pos = mul( PROJECTION, view_pos ); 
 
-   v2f.position = clip_pos; 
-   v2f.color = input.color; 
-   v2f.uv = input.uv; 
-    
-   return v2f;
+	v2f.position = clip_pos; 
+	v2f.color = input.color * TINT; 
+	v2f.uv = input.uv; 
+
+	return v2f;
 }
 
 //--------------------------------------------------------------------------------------
@@ -110,12 +111,12 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-   // First, we sample from our texture
-   float4 texColor = tAlbedo.Sample( sAlbedo, input.uv ); 
+	// First, we sample from our texture
+	float4 texColor = tAlbedo.Sample( sAlbedo, input.uv ); 
 
-   // component wise multiply to "tint" the output
-   float4 finalColor = texColor * input.color; 
+	// component wise multiply to "tint" the output
+	float4 finalColor = texColor * input.color; 
 
-   // output it; 
-   return finalColor; 
+	// output it; 
+	return finalColor; 
 }

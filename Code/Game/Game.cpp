@@ -172,9 +172,11 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.beginColor = Rgba::GREEN;
 	options3D.endColor = Rgba::RED;
 
+	options3D.mode = DEBUG_RENDER_XRAY;
 	//make a 3D point
-	g_debugRenderer->DebugRenderPoint(options3D, Vec3(10.0f, 0.0f, 0.0f), 10.0f );
+	g_debugRenderer->DebugRenderPoint(options3D, Vec3(0.0f, 0.0f, 0.0f), 10000.0f );
 
+	options3D.mode = DEBUG_RENDER_USE_DEPTH;
 	//Make a 3D textured point
 	options3D.beginColor = Rgba::BLUE;
 	options3D.endColor = Rgba::RED;
