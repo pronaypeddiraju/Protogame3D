@@ -182,6 +182,13 @@ void Game::SetStartupDebugRenderObjects()
 	options3D.endColor = Rgba::RED;
 	g_debugRenderer->DebugRenderPoint(options3D, Vec3(-10.0f, 0.0f, 0.0f), 20.f, 1.f, m_textureTest);
 
+	options3D.mode = DEBUG_RENDER_XRAY;
+	//Make a line in 3D
+	options3D.beginColor = Rgba::BLUE;
+	options3D.endColor = Rgba::BLACK;
+	g_debugRenderer->DebugRenderLine(options3D, Vec3(0.f, 0.f, 5.f), Vec3(10.f, 0.f, 10.f), 2000.f);
+
+	options3D.mode = DEBUG_RENDER_USE_DEPTH;
 	//Make a line in 3D
 	options3D.beginColor = Rgba::BLUE;
 	options3D.endColor = Rgba::BLACK;
