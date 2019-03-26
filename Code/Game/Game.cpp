@@ -163,6 +163,16 @@ void Game::SetStartupDebugRenderObjects()
 	const char* text2D = "Read me bruh";
 	g_debugRenderer->DebugRenderText2D(options, Vec2(-100.f, 200.f), Vec2(100.f, 200.f), text2D, DEFAULT_TEXT_HEIGHT, 20.f);
 
+	//Arrow 2D
+	options.beginColor = Rgba::GREEN;
+	options.endColor = Rgba::GREEN;
+	g_debugRenderer->DebugRenderArrow2D(options, Vec2(0.f, 0.f), Vec2(200.f, 200.f), 20.f, 5.f);
+
+	//Arrow 2D
+	options.beginColor = Rgba::BLUE;
+	options.endColor = Rgba::BLUE;
+	g_debugRenderer->DebugRenderArrow2D(options, Vec2(0.f, 0.f), Vec2(200.f, -200.f), 20.f, 5.f);
+
 	//------------------------------------------------------------------------------------------------------------------------------
 	// 3D Objects
 	//------------------------------------------------------------------------------------------------------------------------------
@@ -251,14 +261,14 @@ void Game::SetStartupDebugRenderObjects()
 	//------------------------------------------------------------------------------------------------------------------------------
 	//Setup Debug Options
 	options.mode = DEBUG_RENDER_ALWAYS;
-	options3D.beginColor = Rgba::BLUE;
-	options3D.endColor = Rgba::RED;
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::YELLOW;
 	const char* debugText1 = "Debug Log Test";
 	g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 10.f);
 
 	//Setup Debug Options
-	options3D.beginColor = Rgba::WHITE;
-	options3D.endColor = Rgba::RED;
+	options.beginColor = Rgba::WHITE;
+	options.endColor = Rgba::GREEN;
 	const char* debugText2 = "This is another Debug String";
 	g_debugRenderer->DebugAddToLog(options, debugText2, Rgba::GREEN, 20.f);
 }
