@@ -340,8 +340,14 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Set volume back to 1
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 1.0f);
 
-			//Unsubscribe test event
-			g_eventSystem->UnsubscribeEventCallBackFn("TestEvent", TestEvent);
+			DebugRenderOptionsT options;
+			//Setup Debug Options
+			options.mode = DEBUG_RENDER_ALWAYS;
+			options.beginColor = Rgba::WHITE;
+			options.endColor = Rgba::YELLOW;
+			const char* debugText1 = std::to_string(g_devConsole->GetFrameCount()).c_str();
+			g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 1.f);
+
 			break;
 		}
 		case F5_KEY:
@@ -349,8 +355,14 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Set volume to 0
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 0.0f);
 			
-			//Help Debug
-			g_eventSystem->FireEvent("Help");
+			DebugRenderOptionsT options;
+			//Setup Debug Options
+			options.mode = DEBUG_RENDER_ALWAYS;
+			options.beginColor = Rgba::YELLOW;
+			options.endColor = Rgba::RED;
+			const char* debugText1 = "Debug Log Test";
+			g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 5.f);
+
 			break;
 		}
 		case F6_KEY:
@@ -593,13 +605,20 @@ void Game::Update( float deltaTime )
 
 	CheckXboxInputs();
 	m_animTime += deltaTime;
+
+	DebugRenderOptionsT options;
+	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
+	const char* text = "Current Time %f";
+	
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
+
 	
 	//Update the camera's transform
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 	
-	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
+	//float currentTime = static_cast<float>(GetCurrentTimeSeconds());
 
 	// Set the cube to rotate around y (which is up currently),
 	// and move the object to the left by 5 units (-x)
