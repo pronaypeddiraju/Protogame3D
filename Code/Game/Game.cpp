@@ -489,7 +489,8 @@ void Game::Render() const
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
 	}
 
-	DebugRenderToCamera();
+	//Uncomment to get Debug Rendering to work
+	//DebugRenderToCamera();
 	
 	if(g_devConsole->IsOpen())
 	{	
@@ -501,57 +502,6 @@ void Game::Render() const
 
 void Game::DebugRenderToScreen() const
 {
-	/*
-	Camera& debugCamera3D = *m_mainCamera;
-	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
-	g_renderContext->BeginCamera(debugCamera3D);
-
-	//-----------------------------------------------------------------------------
-	// 3D DEBUG RENDERS
-	//-----------------------------------------------------------------------------
-	//Setup Debug Options
-	DebugRenderOptionsT options3D;
-	options3D.space = DEBUG_RENDER_WORLD;
-	options3D.beginColor = Rgba::GREEN;
-
-	//Make a 3D point in the world
-	g_debugRenderer->DebugRenderPoint(*m_mainCamera, options3D, Vec3(-10.0f, 0.0f, 0.0f), m_textureTest, 0.2f);
-
-	g_renderContext->EndCamera();
-	//-----------------------------------------------------------------------------
-
-	Camera& debugCamera = g_debugRenderer->Get2DCamera();
-	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
-	g_renderContext->BeginCamera(debugCamera);
-
-	//-----------------------------------------------------------------------------
-	// 2D DEBUG RENDERS
-	//-----------------------------------------------------------------------------
-
-	//Setup Debug Options
-	DebugRenderOptionsT options;
-	options.mode = DEBUG_RENDER_ALWAYS;
-	options.beginColor = Rgba::RED;
-
-	//Make 2D Point on screen
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(10.f, 10.f), 5.0f);
-	//Make 2D Point at screen center
-	options.beginColor = Rgba::WHITE;
-	g_debugRenderer->DebugRenderPoint2D(options, Vec2(0.f, 0.f), 0.f);
-
-	ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
-	options.beginColor = Rgba::YELLOW;
-	//Draw a line in 2D screen space
-	g_debugRenderer->DebugRenderLine2D(options, Vec2(ctv->m_width * -0.5f, ctv->m_height * -0.5f), Vec2(-150.f, -150.f), 2.f);
-
-	//Draw a quad in 2D screen space
-	options.beginColor = Rgba::GREEN;
-	g_debugRenderer->DebugRenderQuad2D(options, AABB2(Vec2(-150.f, -150.f), Vec2(-100.f, -100.f)));
-
-	g_renderContext->EndCamera();
-	*/
-
-	
 	Camera& debugCamera = g_debugRenderer->Get2DCamera();
 	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 	g_renderContext->BeginCamera(debugCamera);
@@ -587,7 +537,7 @@ void Game::PostRender()
 	}
 
 	//All screen Debug information
-	DebugRenderToScreen();
+	//DebugRenderToScreen();
 }
 
 void Game::Update( float deltaTime )
@@ -695,15 +645,17 @@ void Game::CreateInitialMeshes()
 
 	// create a cube (centered at zero, with sides 2 length)
 	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.5f, 0.5f, 0.5f)) ); 
+	mesh.SetLayout<Vertex_PCU>();
 	m_cube = new GPUMesh( g_renderContext ); 
-	m_cube->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
+	m_cube->CreateFromCPUMesh<Vertex_PCU>( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
 
 
 																 // create a sphere, cenetered at zero, with 
 	mesh.Clear();
 	CPUMeshAddUVSphere( &mesh, Vec3::ZERO, 1.0f );  
+	mesh.SetLayout<Vertex_PCU>();
 	m_sphere = new GPUMesh( g_renderContext ); 
-	m_sphere->CreateFromCPUMesh( &mesh, GPU_MEMORY_USAGE_STATIC );
+	m_sphere->CreateFromCPUMesh<Vertex_PCU>( &mesh, GPU_MEMORY_USAGE_STATIC );
 }
 
 void Game::LoadGameTextures()
