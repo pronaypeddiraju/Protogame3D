@@ -43,7 +43,8 @@ cbuffer camera_constants : register(b2)
    float4x4 VIEW; 
    float4x4 PROJECTION; 
    
-   float3 CAMERA_POSITION;    float cam_unused0;   // NEW - make sure this is updated and passed in per frame; 
+   float3 CAMERA_POSITION;    
+   float cam_unused0;   
 };
 
 //--------------------------------------------------------------------------------------
@@ -132,6 +133,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
    // component wise multiply to "tint" the output
    float4 finalColor = final_color * input.color; 
+   //float4 finalColor = float4(((normalize(CAMERA_POSITION)) * 0.5f) + 1.f, 0.f);
+
 
    // output it; 
    //return float4(1.f, 0.f, 0.f, 1.f);

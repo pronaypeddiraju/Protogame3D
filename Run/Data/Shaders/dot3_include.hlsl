@@ -7,10 +7,10 @@ struct light_t
    float intensity; 
 
    float3 position; 
-   float is_directional;
+   float pad10; 
 
    float3 direction; 
-   float pad10; 
+   float is_directional;
 
    float3 diffuse_attenuation; 
    float pad20; 
@@ -43,9 +43,10 @@ struct lighting_t
 //--------------------------------------------------------------------------------------
 lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_normal )
 {
-   // 
+
    lighting_t lighting; 
-   lighting.diffuse = (AMBIENT.xyz * AMBIENT.w); 
+   //lighting.diffuse = (AMBIENT.rgb * AMBIENT.a); 
+   lighting.diffuse = (0.f); 
 
    float3 dir_to_eye = normalize(eye_pos - surface_position); 
 
@@ -53,7 +54,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
    // directional light; 
    for (int i = 0; i < MAX_LIGHTS; i++) 
    {
-      light_t light = LIGHTS[i]; 
+      light_t light = LIGHTS[0]; 
 
       // directional 
       float3 dir_dir = light.direction; 
@@ -78,7 +79,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
       // Specular 
       // blinn-phong 
       // dot( H, N );  -> H == half_vector, N == normal
-      vec3 dir_to_light = -light_dir; 
+      float3 dir_to_light = -light_dir; 
       float3 half_vector = normalize( dir_to_eye + dir_to_light ); 
       float spec_coefficient = max( dot( half_vector, normal ), 0.0f ); // DO not saturate - spec can go higher;  
 
