@@ -68,7 +68,23 @@ void Game::StartUp()
 
 	g_eventSystem->SubscribeEventCallBackFn("TestEvent", TestEvent);
 
+	g_eventSystem->SubscribeEventCallBackFn("ToggleLight1", ToggleLight1);
+	g_eventSystem->SubscribeEventCallBackFn("ToggleLight2", ToggleLight2);
+	g_eventSystem->SubscribeEventCallBackFn("ToggleLight3", ToggleLight3);
+	g_eventSystem->SubscribeEventCallBackFn("ToggleLight4", ToggleLight4);
+
 	CreateInitialMeshes();
+
+	CreateInitialLight();
+
+	//Only to keep track of what input does what
+	DebugRenderOptionsT options;
+	options.space = DEBUG_RENDER_SCREEN;
+	g_debugRenderer->DebugAddToLog(options, "F1 and F2 to increase/decrease ambient light intensity", Rgba::WHITE, 20000.f);
+	g_debugRenderer->DebugAddToLog(options, "F3 to toggle directional light", Rgba::WHITE, 20000.f);
+	g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);
+	g_debugRenderer->DebugAddToLog(options, "", Rgba::WHITE, 20000.f);
+
 }
 
 void Game::SetupMouseData()
@@ -281,11 +297,76 @@ STATIC bool Game::TestEvent(EventArgs& args)
 	return true;
 }
 
+STATIC bool Game::ToggleLight1( EventArgs& args )
+{
+	UNUSED(args);
+	if(g_renderContext->m_cpuLightBuffer.lights[1].color.a != 0.f)
+	{
+		g_devConsole->PrintString(Rgba::RED, "Disabling Light 1");
+		g_renderContext->m_cpuLightBuffer.lights[1].color.a = 0.f;
+	}
+	else
+	{
+		g_devConsole->PrintString(Rgba::GREEN, "Enabling Light 1");
+		g_renderContext->m_cpuLightBuffer.lights[1].color.a = 1.f;
+	}
+	return true;
+}
+
+STATIC bool Game::ToggleLight2( EventArgs& args )
+{
+	UNUSED(args);
+	if(g_renderContext->m_cpuLightBuffer.lights[2].color.a != 0.f)
+	{
+		g_devConsole->PrintString(Rgba::RED, "Disabling Light 2");
+		g_renderContext->m_cpuLightBuffer.lights[2].color.a = 0.f;
+	}
+	else
+	{
+		g_devConsole->PrintString(Rgba::GREEN, "Enabling Light 2");
+		g_renderContext->m_cpuLightBuffer.lights[2].color.a = 1.f;
+	}
+	return true;
+}
+
+STATIC bool Game::ToggleLight3( EventArgs& args )
+{
+	UNUSED(args);
+	if(g_renderContext->m_cpuLightBuffer.lights[3].color.a != 0.f)
+	{
+		g_devConsole->PrintString(Rgba::RED, "Disabling Light 3");
+		g_renderContext->m_cpuLightBuffer.lights[3].color.a = 0.f;
+	}
+	else
+	{
+		g_devConsole->PrintString(Rgba::GREEN, "Enabling Light 3");
+		g_renderContext->m_cpuLightBuffer.lights[3].color.a = 1.f;
+	}
+	return true;
+}
+
+bool Game::ToggleLight4( EventArgs& args )
+{
+	UNUSED(args);
+	if(g_renderContext->m_cpuLightBuffer.lights[4].color.a != 0.f)
+	{
+		g_devConsole->PrintString(Rgba::RED, "Disabling Light 4");
+		g_renderContext->m_cpuLightBuffer.lights[4].color.a = 0.f;
+	}
+	else
+	{
+		g_devConsole->PrintString(Rgba::GREEN, "Enabling Light 4");
+		g_renderContext->m_cpuLightBuffer.lights[4].color.a = 1.f;
+	}
+	return true;
+}
+
 void Game::HandleKeyPressed(unsigned char keyCode)
 {
 	if(g_devConsole->IsOpen())
 	{
 		g_devConsole->HandleKeyDown(keyCode);
+		return;
 	}
 
 	switch( keyCode )
@@ -297,8 +378,22 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case SPACE_KEY:
 		case N_KEY:
 		case F1_KEY:
+		{
+			//Setup the ambient intensity to lesser
+			m_ambientIntensity -= m_ambientStep;
+		}
+		break;
 		case F2_KEY:
+		{
+			//Setup the ambient intensity to lesser
+			m_ambientIntensity += m_ambientStep;
+		}
+		break;
 		case F3_KEY:
+		{
+			//Toggle directional light
+			m_enableDirectional = !m_enableDirectional;
+		}
 		break;
 		case A_KEY:
 		{
@@ -341,6 +436,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Set volume back to 1
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 1.0f);
 
+			/*
 			DebugRenderOptionsT options;
 			//Setup Debug Options
 			options.mode = DEBUG_RENDER_ALWAYS;
@@ -348,6 +444,10 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			options.endColor = Rgba::YELLOW;
 			const char* debugText1 = std::to_string(g_devConsole->GetFrameCount()).c_str();
 			g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 1.f);
+			*/
+			
+			//Toggle Shader here
+			m_normalMode = !m_normalMode;
 
 			break;
 		}
@@ -405,6 +505,9 @@ void Game::Shutdown()
 
 	delete m_quad;
 	m_quad = nullptr;
+
+	delete m_baseQuad;
+	m_baseQuad = nullptr;
 
 	//FreeResources();
 }
@@ -478,7 +581,6 @@ void Game::Render() const
 	m_devConsoleCamera->SetColorTarget(colorTargetView);
 
 	// Move the camera to where it is in the scene
-	// (right now, no rotation (looking forward), set 10 back (so looking at 0,0,0)
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
@@ -487,29 +589,32 @@ void Game::Render() const
 	
 	g_renderContext->ClearColorTargets(Rgba::BLUE);
 
-	g_renderContext->SetAmbientLight( Rgba::RED, 1.f ); 
+	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
+	g_renderContext->SetAmbientLight( Rgba::RED, intensity ); 
 
 	// enable a point light as some position in the world with a normal quadratic falloff; 
-	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
-	//EnablePointLight( 1U, Vec3(0.f, 1.f, -1.f), Vec3(0.f, 0.f, 1.f));
+	if(m_enableDirectional)
+	{
+		g_renderContext->DisableDirectionalLight();
+	}
+	else 
+	{
+		g_renderContext->EnableDirectionalLight();
+	}
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	//g_renderContext->BindShader( m_shader );
-	g_renderContext->BindShader( m_defaultLit );
+	if(m_normalMode)
+	{
+		g_renderContext->BindShader( m_normalShader );
+	}
+	else
+	{
+		g_renderContext->BindShader( m_defaultLit );
+	}
 	
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
-
-	/*
-	std::vector<Vertex_PCU> triangleVerts;
-	
-	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, -1.f, 0.f), Rgba::RED, Vec2::ZERO));
-	triangleVerts.push_back(Vertex_PCU(Vec3(1.f, -1.f, 0.f), Rgba::GREEN, Vec2::ZERO));
-	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, 1.f, 0.f), Rgba::BLUE, Vec2::ZERO));
-
-	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	g_renderContext->DrawVertexArray(triangleVerts);
-	*/
 
 	//Render the cube
 	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
@@ -526,6 +631,11 @@ void Game::Render() const
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawMesh( m_quad );
 
+	//Render the Quad
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	g_renderContext->SetModelMatrix(m_baseQuadTransform);
+	g_renderContext->DrawMesh( m_baseQuad );
+
 	g_renderContext->EndCamera();
 
 	if(!m_consoleDebugOnce)
@@ -537,7 +647,7 @@ void Game::Render() const
 	}
 
 	//Uncomment to get Debug Rendering to work
-	//DebugRenderToCamera();
+	DebugRenderToCamera();
 	
 	if(g_devConsole->IsOpen())
 	{	
@@ -551,6 +661,8 @@ void Game::DebugRenderToScreen() const
 {
 	Camera& debugCamera = g_debugRenderer->Get2DCamera();
 	debugCamera.m_colorTargetView = g_renderContext->GetFrameColorTarget();
+	
+	g_renderContext->BindShader(m_shader);
 	g_renderContext->BeginCamera(debugCamera);
 	
 	g_debugRenderer->DebugRenderToScreen();
@@ -564,6 +676,7 @@ void Game::DebugRenderToCamera() const
 	Camera& debugCamera3D = *m_mainCamera;
 	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 
+	g_renderContext->BindShader(m_shader);
 	g_renderContext->BeginCamera(debugCamera3D);
 	
 	g_debugRenderer->Setup3DCamera(&debugCamera3D);
@@ -579,16 +692,24 @@ void Game::PostRender()
 
 	if(!m_isDebugSetup)
 	{
-		SetStartupDebugRenderObjects();
+		//SetStartupDebugRenderObjects();
+
+		ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
+		//Setup debug render client data
+		g_debugRenderer->SetClientDimensions( ctv->m_height, ctv->m_width );
+
 		m_isDebugSetup = true;
 	}
 
 	//All screen Debug information
-	//DebugRenderToScreen();
+	DebugRenderToScreen();
 }
 
 void Game::Update( float deltaTime )
 {
+
+	UpdateLightPositions();
+
 	UpdateMouseInputs(deltaTime);
 
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
@@ -679,6 +800,74 @@ bool Game::IsAlive()
 	return m_isGameAlive;
 }
 
+void Game::UpdateLightPositions()
+{
+	//Update all the 4 light positions
+	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
+	DebugRenderOptionsT options;
+	options.space = DEBUG_RENDER_WORLD;
+	//Light 1
+	m_dynamicLight0Pos = Vec3(-3.f, 2.f * CosDegrees(currentTime * 20.f), 2.f * SinDegrees(currentTime * 20.f));
+
+	g_renderContext->m_cpuLightBuffer.lights[1].position = m_dynamicLight0Pos;
+	g_renderContext->m_lightBufferDirty = true;
+
+	options.beginColor = Rgba::GREEN;
+	options.endColor = Rgba::GREEN;
+	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight0Pos, 0.1f, 0.1f, nullptr);
+
+	//Light 2
+	m_dynamicLight1Pos = Vec3(3.f, 3.f * CosDegrees(currentTime * 40.f), 3.f * SinDegrees(currentTime * 40.f));
+	g_renderContext->m_cpuLightBuffer.lights[2].position = m_dynamicLight1Pos;
+	g_renderContext->m_lightBufferDirty = true;
+
+	options.beginColor = Rgba::BLUE;
+	options.endColor = Rgba::BLUE;
+	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight1Pos, 0.1f, 0.1f, nullptr);
+
+	//Light 3
+	m_dynamicLight2Pos = Vec3(-1.f, 1.f * CosDegrees(currentTime * 30.f), 1.f * SinDegrees(currentTime * 30.f));
+	g_renderContext->m_cpuLightBuffer.lights[3].position = m_dynamicLight2Pos;
+	g_renderContext->m_lightBufferDirty = true;
+
+	options.beginColor = Rgba::YELLOW;
+	options.endColor = Rgba::YELLOW;
+	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight2Pos, 0.1f, 0.1f, nullptr);
+
+	//Light 4
+	m_dynamicLight3Pos = Vec3(4.f * CosDegrees(currentTime * 60.f), 0.f , 4.f * SinDegrees(currentTime * 60.f));
+	g_renderContext->m_cpuLightBuffer.lights[4].position = m_dynamicLight3Pos;
+	g_renderContext->m_lightBufferDirty = true;
+
+	options.beginColor = Rgba::MAGENTA;
+	options.endColor = Rgba::MAGENTA;
+	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight3Pos, 0.1f, 0.1f, nullptr);
+
+
+	/*
+	if(m_dynamicLight0Pos.y < 3.f)
+	{
+	m_dynamicLight0Pos = Vec3(-3.f, deltaSeconds * m_ySpeed , 0.f);
+	}
+	else
+	{
+	m_dynamicLight0Pos = Vec3(-3.f, deltaSeconds * -m_ySpeed , 0.f);
+	}
+
+	g_renderContext->m_cpuLightBuffer.lights[0].position = m_dynamicLight0Pos;
+	*/
+}
+
+void Game::CreateInitialLight()
+{
+	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
+
+	EnablePointLight(1U, m_dynamicLight0Pos, Vec3(1.f, 0.f, 0.f),Rgba::GREEN);
+	EnablePointLight(2U, m_dynamicLight1Pos, Vec3(0.f, -1.f, 0.f), Rgba::BLUE, 1.f, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	EnablePointLight(3U, m_dynamicLight2Pos, Vec3(0.f, 0.f, 1.f), Rgba::YELLOW, 1.f, Vec3(0.f, 1.f, 0.1f), Vec3(0.f, 1.f, 0.1f));
+	EnablePointLight(4U, m_dynamicLight3Pos, Vec3(-1.f, -1.f, 0.f), Rgba::MAGENTA, 1.f, Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, 1.f));
+}
+
 void Game::CreateInitialMeshes()
 {
 
@@ -703,6 +892,18 @@ void Game::CreateInitialMeshes()
 	//mesh.SetLayout<Vertex_Lit>();
 	m_sphere = new GPUMesh( g_renderContext ); 
 	m_sphere->CreateFromCPUMesh<Vertex_Lit>( &mesh, GPU_MEMORY_USAGE_STATIC );
+
+	//Create another quad as a base plane
+	mesh.Clear();
+	CPUMeshAddQuad(&mesh, AABB2(Vec2(-50.f, -50.f), Vec2(50.f, 50.f)));
+
+	//mesh.SetLayout<Vertex_Lit>();
+	m_baseQuad = new GPUMesh( g_renderContext ); 
+	m_baseQuad->CreateFromCPUMesh<Vertex_Lit>( &mesh, GPU_MEMORY_USAGE_STATIC );
+
+	m_baseQuadTransform = Matrix44::IDENTITY;
+	m_baseQuadTransform = Matrix44::MakeFromEuler(Vec3(-90.f, 0.f, 0.f));
+	m_baseQuadTransform = Matrix44::SetTranslation3D(Vec3(0.f, -1.f, 0.f), m_baseQuadTransform);
 }
 
 void Game::LoadGameTextures()

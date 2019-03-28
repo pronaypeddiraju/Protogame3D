@@ -26,7 +26,11 @@ public:
 	~Game();
 	
 	static bool TestEvent(EventArgs& args);
-	
+	static bool ToggleLight1(EventArgs& args);
+	static bool ToggleLight2(EventArgs& args);
+	static bool ToggleLight3(EventArgs& args);
+	static bool ToggleLight4(EventArgs& args);
+
 	void								StartUp();
 	
 	void								SetupMouseData();
@@ -34,6 +38,7 @@ public:
 	void								GetandSetShaders();
 	void								LoadGameTextures();
 	void								CreateInitialMeshes();
+	void								CreateInitialLight();
 	void								SetStartupDebugRenderObjects();
 
 
@@ -60,6 +65,7 @@ public:
 	void								PostRender();
 	void								Update( float deltaTime );
 	void								UpdateMouseInputs(float deltaTime);
+	void								UpdateLightPositions();
 	void								UpdateCamera( float deltaTime );
 	void								ClearGarbageEntities();
 	void								CheckXboxInputs();
@@ -116,5 +122,23 @@ public:
 
 	GPUMesh*							m_quad = nullptr;
 
+	GPUMesh*							m_baseQuad = nullptr;
+	Matrix44							m_baseQuadTransform;
+
+	//Lighting Assignment
 	int									m_lightSlot;
+	float								m_ambientIntensity = 1.f;
+	float								m_ambientStep = 0.1f;
+
+	bool								m_enableDirectional = true;
+	bool								m_normalMode = false;
+
+	//Light positions
+	Vec3								m_dynamicLight0Pos = Vec3::ZERO;
+	Vec3								m_dynamicLight1Pos = Vec3::ZERO;
+	Vec3								m_dynamicLight2Pos = Vec3::ZERO;
+	Vec3								m_dynamicLight3Pos = Vec3::ZERO;
+	
+	//Light movement
+	float								m_ySpeed = 2.f;
 };

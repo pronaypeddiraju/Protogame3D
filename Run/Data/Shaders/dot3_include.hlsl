@@ -54,7 +54,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
    // directional light; 
    for (int i = 0; i < MAX_LIGHTS; i++) 
    {
-      light_t light = LIGHTS[0]; 
+      light_t light = LIGHTS[i]; 
 
       // directional 
       float3 dir_dir = normalize(light.direction); 
@@ -70,6 +70,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
       // Diffuse Part
       float3 la = light.diffuse_attenuation; 
       float attenuation = 1.0f / (la.x + la.y * distance + la.z * distance * distance); 
+
       float dot3 = max( dot( -light_dir, surface_normal ), 0.0f ); 
 
       float3 diffuse_color = light.color * light.intensity * attenuation * dot3; 
@@ -79,9 +80,14 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
       // Specular 
       // blinn-phong 
       // dot( H, N );  -> H == half_vector, N == normal
+		//Edit: Make sure the direction between light and normal is less than 90 degrees in difference
+      float dotCheck = dot (surface_normal, -light_dir);
+      float dotResult = (dotCheck >= 0.0f) ? 1.0f : 0.0f; 
+
+
       float3 dir_to_light = -light_dir; 
       float3 half_vector = normalize( dir_to_eye + dir_to_light ); 
-      float spec_coefficient = max( dot( half_vector, surface_normal ), 0.0f ); // DO not saturate - spec can go higher;  
+      float spec_coefficient = dotResult * max( dot( half_vector, surface_normal ), 0.0f ); // DO not saturate - spec can go higher;  
 
       float3 sa = light.specular_attenuation; 
       float spec_attenuation = 1.0f / (sa.x + sa.y * distance + sa.z * distance * distance); 
