@@ -439,6 +439,35 @@ void Game::HandleCharacter( unsigned char charCode )
 	}
 }
 
+void Game::EnablePointLight( uint slot, const Vec3& position, const Vec3& direction, const Rgba& color /*= Rgba::WHITE*/, float intensity /*= 1.f*/, const Vec3& diffuseAttenuation, const Vec3& specularAttenuation ) const
+{
+	LightT pointLight;
+
+	pointLight.position = position;
+	pointLight.color = color;
+	pointLight.color.a = intensity;
+	pointLight.direction = direction;
+	pointLight.diffuseAttenuation = diffuseAttenuation;
+	pointLight.specularAttenuation = specularAttenuation;
+
+	g_renderContext->EnableLight(slot, pointLight);
+}
+
+void Game::EnableDirectionalLight( const Vec3& position, const Vec3& direction,  const Rgba& color /*= Rgba::WHITE*/, float intensity /*= 1.f*/, const Vec3& diffuseAttenuation, const Vec3& specularAttenuation) const
+{
+	LightT directionalLight;
+
+	directionalLight.position = position;
+	directionalLight.color = color;
+	directionalLight.color.a = intensity;
+	directionalLight.direction = direction;
+	directionalLight.isDirection = 1.f;
+	directionalLight.diffuseAttenuation = diffuseAttenuation;
+	directionalLight.specularAttenuation = specularAttenuation;
+
+	g_renderContext->EnableLight(0U, directionalLight);
+}
+
 void Game::Render() const
 {
 	//Get the ColorTargetView from rendercontext
@@ -454,14 +483,19 @@ void Game::Render() const
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
 	m_mainCamera->SetModelMatrix(camTransform);
 
-	m_mainCamera->UpdateUniformBuffer(g_renderContext);
-
 	g_renderContext->BeginCamera(*m_mainCamera); 
-	g_renderContext->ClearColorTargets(Rgba::BLACK);
+	
+	g_renderContext->ClearColorTargets(Rgba::BLUE);
+
+	g_renderContext->SetAmbientLight( Rgba::WHITE, 0.5f ); 
+
+	// enable a point light as some position in the world with a normal quadratic falloff; 
+	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
+	//EnablePointLight( 1U, Vec3(0.f, 1.f, -1.f), Vec3(0.f, 0.f, 1.f));
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	//g_renderContext->BindShader( m_shader );
-	g_renderContext->BindShader( m_normalShader );
+	g_renderContext->BindShader( m_defaultLit );
 	
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
@@ -687,6 +721,9 @@ void Game::GetandSetShaders()
 
 	m_normalShader = g_renderContext->CreateOrGetShaderFromFile(m_normalColorShader);
 	m_normalShader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
+
+	m_defaultLit = g_renderContext->CreateOrGetShaderFromFile(m_shaderLitPath);
+	m_defaultLit->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
 }
 
 void Game::UpdateMouseInputs(float deltaTime)

@@ -41,6 +41,16 @@ public:
 	void								HandleKeyReleased( unsigned char keyCode );
 	void								HandleCharacter( unsigned char charCode );
 
+	void								EnablePointLight( uint slot, const Vec3& position, const Vec3& direction,
+															const Rgba& color = Rgba::WHITE, float intensity = 1.f,
+															const Vec3& diffuseAttenuation = Vec3(1.f, 0.f, 0.f),
+															const Vec3& specularAttenuation = Vec3(1.f, 0.f, 0.f)) const;
+	
+	void								EnableDirectionalLight( const Vec3& position, const Vec3& direction,
+															const Rgba& color = Rgba::WHITE, float intensity = 1.f,
+															const Vec3& diffuseAttenuation = Vec3(1.f, 0.f, 0.f),
+															const Vec3& specularAttenuation = Vec3(1.f, 0.f, 0.f)) const;
+
 	void								DebugEnabled();
 	void								Shutdown();
 
@@ -76,7 +86,9 @@ public:
 	//D3D11 stuff
 	Shader*								m_shader = nullptr;
 	Shader*								m_normalShader = nullptr;
+	Shader*								m_defaultLit = nullptr;
 	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
+	std::string							m_shaderLitPath = "default_lit.hlsl";
 	std::string							m_normalColorShader = "normal_shader.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 	std::string							m_boxTexturePath = "woodcrate.jpg";
@@ -103,4 +115,6 @@ public:
 	Matrix44							m_sphereTransform;   // sphere's model matrix
 
 	GPUMesh*							m_quad = nullptr;
+
+	int									m_lightSlot;
 };

@@ -1,3 +1,5 @@
+#include "dot3_include.hlsl"
+
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -40,6 +42,8 @@ cbuffer camera_constants : register(b2)
 {
    float4x4 VIEW; 
    float4x4 PROJECTION; 
+   
+   float3 CAMERA_POSITION;    float cam_unused0;   // NEW - make sure this is updated and passed in per frame; 
 };
 
 //--------------------------------------------------------------------------------------
@@ -75,10 +79,11 @@ SamplerState sAlbedo : register(s0);      // sampler I'm using for the Albedo te
 // for passing data from vertex to fragment (v-2-f)
 struct v2f_t 
 {
-   float4 position   : SV_POSITION; 
-   float4 normal     : NORMAL;
-   float4 color      : COLOR; 
-   float2 uv         : UV; 
+   float4 position : SV_POSITION; 
+   float3 normal : NORMAL;
+   float3 worldPos : WORLDPOS;
+   float4 color : COLOR; 
+   float2 uv : UV; 
 }; 
 
 //--------------------------------------------------------------------------------------
@@ -98,20 +103,12 @@ v2f_t VertexFunction(vs_input_t input)
    float4 view_pos = mul( VIEW, world_pos ); 
    float4 clip_pos = mul( PROJECTION, view_pos ); 
 
-   v2f.position = clip_pos;
-
-   //v2f.color = input.color; 
-
-   float4 normals = mul( MODEL, float4(input.normal, 0.f));
-
-   v2f.color.x = RangeMap(normals.x, -1.0f, 1.0f, 0.0f, 1.0f);
-   v2f.color.y = RangeMap(normals.y, -1.0f, 1.0f, 0.0f, 1.0f);
-   v2f.color.z = RangeMap(normals.z, -1.0f, 1.0f, 0.0f, 1.0f);
-   v2f.color.w = 1.0f;
-
+   v2f.position = clip_pos; 
+   v2f.color = input.color; 
    v2f.uv = input.uv; 
-   
-    
+   v2f.worldPos = world_pos.xyz;
+   v2f.normal = mul(MODEL, float4(input.normal, 0.f)).xyz;
+
    return v2f;
 }
 
@@ -123,11 +120,20 @@ v2f_t VertexFunction(vs_input_t input)
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
    // First, we sample from our texture
-   //float4 texColor = tAlbedo.Sample( sAlbedo, input.uv ); 
+   float4 texColor = tAlbedo.Sample( sAlbedo, input.uv ) * input.color; 
+   //GAMMA correction
+   texColor = pow(texColor, GAMMA);
+
+   lighting_t lighting = GetLighting( CAMERA_POSITION, input.worldPos, input.normal );
+
+   //TO-DO: Add specularity!
+   float4 final_color = float4(lighting.diffuse, 1.0f) * texColor;
+   final_color = pow( final_color, 1.0f / GAMMA ); // convert back to sRGB space
 
    // component wise multiply to "tint" the output
-   float4 finalColor = input.color; 
+   float4 finalColor = final_color * input.color; 
 
    // output it; 
+   //return float4(1.f, 0.f, 0.f, 1.f);
    return finalColor; 
 }
