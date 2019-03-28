@@ -125,14 +125,17 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
    //GAMMA correction
    texColor = pow(texColor, GAMMA);
 
-   lighting_t lighting = GetLighting( CAMERA_POSITION, input.worldPos, input.normal );
+   lighting_t lighting = GetLighting( CAMERA_POSITION, input.worldPos, normalize(input.normal) );
 
    //TO-DO: Add specularity!
    float4 final_color = float4(lighting.diffuse, 1.0f) * texColor;
+   final_color += float4(lighting.specular, 0.f);
    final_color = pow( final_color, 1.0f / GAMMA ); // convert back to sRGB space
 
    // component wise multiply to "tint" the output
    float4 finalColor = final_color * input.color; 
+   
+   //DEBUGGING STUFF
    //float4 finalColor = float4(((normalize(CAMERA_POSITION)) * 0.5f) + 1.f, 0.f);
 
 

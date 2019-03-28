@@ -487,7 +487,7 @@ void Game::Render() const
 	
 	g_renderContext->ClearColorTargets(Rgba::BLUE);
 
-	g_renderContext->SetAmbientLight( Rgba::WHITE, 0.5f ); 
+	g_renderContext->SetAmbientLight( Rgba::RED, 1.f ); 
 
 	// enable a point light as some position in the world with a normal quadratic falloff; 
 	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));

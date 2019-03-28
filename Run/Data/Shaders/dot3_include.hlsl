@@ -45,8 +45,8 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
 {
 
    lighting_t lighting; 
-   //lighting.diffuse = (AMBIENT.rgb * AMBIENT.a); 
-   lighting.diffuse = (0.f); 
+   lighting.diffuse = (AMBIENT.rgb * AMBIENT.a); 
+   //lighting.diffuse = (0.f); 
 
    float3 dir_to_eye = normalize(eye_pos - surface_position); 
 
@@ -57,7 +57,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
       light_t light = LIGHTS[0]; 
 
       // directional 
-      float3 dir_dir = light.direction; 
+      float3 dir_dir = normalize(light.direction); 
       float3 point_dir = normalize(surface_position - light.position); 
       float3 light_dir = lerp( point_dir, dir_dir, light.is_directional ); 
 
@@ -69,19 +69,19 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
 
       // Diffuse Part
       float3 la = light.diffuse_attenuation; 
-      float attenuation = 1.0f;// / (la.x + la.y * distance + la.z * distance * distance); 
+      float attenuation = 1.0f / (la.x + la.y * distance + la.z * distance * distance); 
       float dot3 = max( dot( -light_dir, surface_normal ), 0.0f ); 
 
       float3 diffuse_color = light.color * light.intensity * attenuation * dot3; 
       lighting.diffuse += diffuse_color; 
 
-      /*
+      
       // Specular 
       // blinn-phong 
       // dot( H, N );  -> H == half_vector, N == normal
       float3 dir_to_light = -light_dir; 
       float3 half_vector = normalize( dir_to_eye + dir_to_light ); 
-      float spec_coefficient = max( dot( half_vector, normal ), 0.0f ); // DO not saturate - spec can go higher;  
+      float spec_coefficient = max( dot( half_vector, surface_normal ), 0.0f ); // DO not saturate - spec can go higher;  
 
       float3 sa = light.specular_attenuation; 
       float spec_attenuation = 1.0f / (sa.x + sa.y * distance + sa.z * distance * distance); 
@@ -90,7 +90,7 @@ lighting_t GetLighting( float3 eye_pos, float3 surface_position, float3 surface_
       spec_coefficient = SPEC_FACTOR * pow( spec_coefficient, SPEC_POWER ); 
       float3 specular_color = light.color * light.intensity * spec_attenuation * spec_coefficient; 
       lighting.specular += specular_color; 
-      */
+      
    }
 
    lighting.diffuse = saturate(lighting.diffuse); // clamp this to (0, 1)
