@@ -13,6 +13,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Matrix44.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Math/Vertex_Lit.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/ColorTargetView.hpp"
@@ -402,6 +403,9 @@ void Game::Shutdown()
 	delete m_sphere;
 	m_sphere = nullptr;
 
+	delete m_quad;
+	m_quad = nullptr;
+
 	//FreeResources();
 }
 
@@ -478,6 +482,11 @@ void Game::Render() const
 	g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
 	g_renderContext->SetModelMatrix( m_sphereTransform ); 
 	g_renderContext->DrawMesh( m_sphere ); 
+
+	//Render the Quad
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	g_renderContext->DrawMesh( m_quad );
 
 	g_renderContext->EndCamera();
 
@@ -637,25 +646,25 @@ void Game::CreateInitialMeshes()
 
 	//Meshes for A4
 	CPUMesh mesh;
-	/*
 	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)));
 	m_quad = new GPUMesh(g_renderContext);
-	m_quad->CreateFromCPUMesh(&mesh, GPU_MEMORY_USAGE_STATIC);
-	*/
+	m_quad->CreateFromCPUMesh<Vertex_Lit>(&mesh, GPU_MEMORY_USAGE_STATIC);
 
 	// create a cube (centered at zero, with sides 2 length)
 	CPUMeshAddCube( &mesh, AABB3( Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.5f, 0.5f, 0.5f)) ); 
-	mesh.SetLayout<Vertex_PCU>();
+	
+	//mesh.SetLayout<Vertex_Lit>();
 	m_cube = new GPUMesh( g_renderContext ); 
-	m_cube->CreateFromCPUMesh<Vertex_PCU>( &mesh, GPU_MEMORY_USAGE_STATIC ); // we won't be updated this; 
+	m_cube->CreateFromCPUMesh<Vertex_Lit>( &mesh, GPU_MEMORY_USAGE_STATIC );
 
 
-																 // create a sphere, cenetered at zero, with 
+	// create a sphere, cenetered at zero, with 
 	mesh.Clear();
 	CPUMeshAddUVSphere( &mesh, Vec3::ZERO, 1.0f );  
-	mesh.SetLayout<Vertex_PCU>();
+	
+	//mesh.SetLayout<Vertex_Lit>();
 	m_sphere = new GPUMesh( g_renderContext ); 
-	m_sphere->CreateFromCPUMesh<Vertex_PCU>( &mesh, GPU_MEMORY_USAGE_STATIC );
+	m_sphere->CreateFromCPUMesh<Vertex_Lit>( &mesh, GPU_MEMORY_USAGE_STATIC );
 }
 
 void Game::LoadGameTextures()

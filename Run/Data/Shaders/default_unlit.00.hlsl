@@ -15,7 +15,7 @@
 // inputs/outputs, so probably best to avoid that naming.
 struct vs_input_t 
 {
-   float3 position      : POSITION; 
+   float3 position      : POSITION;
    float4 color         : COLOR; 
    float2 uv            : TEXCOORD; 
 }; 
@@ -99,6 +99,7 @@ v2f_t VertexFunction(vs_input_t input)
    v2f.position = clip_pos; 
    v2f.color = input.color; 
    v2f.uv = input.uv; 
+   
     
    return v2f;
 }

@@ -94,9 +94,11 @@ public:
 
 	//FOR ASSIGNMENT 4:
 	// Define the shapes, and how are they positionedin the world; 
-	GPUMesh*							m_cube; 
+	GPUMesh*							m_cube = nullptr; 
 	Matrix44							m_cubeTransform; // cube's model matrix
 
-	GPUMesh*							m_sphere;
+	GPUMesh*							m_sphere = nullptr;
 	Matrix44							m_sphereTransform;   // sphere's model matrix
+
+	GPUMesh*							m_quad = nullptr;
 };
