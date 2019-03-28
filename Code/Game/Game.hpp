@@ -75,7 +75,9 @@ public:
 
 	//D3D11 stuff
 	Shader*								m_shader = nullptr;
+	Shader*								m_normalShader = nullptr;
 	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
+	std::string							m_normalColorShader = "normal_shader.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 	std::string							m_boxTexturePath = "woodcrate.jpg";
 	std::string							m_sphereTexturePath = "2k_earth_daymap.jpg";
@@ -85,7 +87,7 @@ public:
 	Camera*								m_devConsoleCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
 	
-	float								m_camFOVDegrees = 90.f; //Desired Camera Field of View
+	float								m_camFOVDegrees = 60.f; //Desired Camera Field of View
 	eRotationOrder						m_rotationOrder = ROTATION_ORDER_DEFAULT;
 	Vec3								m_camPosition = Vec3::ZERO;
 

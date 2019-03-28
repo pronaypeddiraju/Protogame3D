@@ -460,10 +460,13 @@ void Game::Render() const
 	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
-	g_renderContext->BindShader( m_shader );
+	//g_renderContext->BindShader( m_shader );
+	g_renderContext->BindShader( m_normalShader );
+	
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
 
+	/*
 	std::vector<Vertex_PCU> triangleVerts;
 	
 	triangleVerts.push_back(Vertex_PCU(Vec3(-1.f, -1.f, 0.f), Rgba::RED, Vec2::ZERO));
@@ -472,6 +475,7 @@ void Game::Render() const
 
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawVertexArray(triangleVerts);
+	*/
 
 	//Render the cube
 	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
@@ -581,10 +585,10 @@ void Game::Update( float deltaTime )
 
 	// Set the cube to rotate around y (which is up currently),
 	// and move the object to the left by 5 units (-x)
-	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, 3.0f * currentTime, 0.0f), m_rotationOrder ); 
+	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, 60.0f * currentTime, 0.0f), m_rotationOrder ); 
 	m_cubeTransform = Matrix44::SetTranslation3D( Vec3(-5.0f, 0.0f, 0.0f), m_cubeTransform);
 
-	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -2.0f * currentTime, 0.0f) ); 
+	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
 	m_sphereTransform = Matrix44::SetTranslation3D( Vec3(5.0f, 0.0f, 0.0f), m_sphereTransform);
 
 	CheckCollisions();
@@ -680,6 +684,9 @@ void Game::GetandSetShaders()
 	//Get the Shader
 	m_shader = g_renderContext->CreateOrGetShaderFromFile(m_xmlShaderPath);
 	m_shader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
+
+	m_normalShader = g_renderContext->CreateOrGetShaderFromFile(m_normalColorShader);
+	m_normalShader->SetDepth(eCompareOp::COMPARE_LEQUAL, true);
 }
 
 void Game::UpdateMouseInputs(float deltaTime)
