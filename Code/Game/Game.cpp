@@ -813,7 +813,7 @@ void Game::UpdateLightPositions()
 	g_renderContext->m_lightBufferDirty = true;
 
 	options.beginColor = Rgba::GREEN;
-	options.endColor = Rgba::GREEN;
+	options.endColor = Rgba::GREEN * 0.4f;
 	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight0Pos, 0.1f, 0.1f, nullptr);
 
 	//Light 2
@@ -822,7 +822,7 @@ void Game::UpdateLightPositions()
 	g_renderContext->m_lightBufferDirty = true;
 
 	options.beginColor = Rgba::BLUE;
-	options.endColor = Rgba::BLUE;
+	options.endColor = Rgba::BLUE * 0.4f;
 	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight1Pos, 0.1f, 0.1f, nullptr);
 
 	//Light 3
@@ -831,7 +831,7 @@ void Game::UpdateLightPositions()
 	g_renderContext->m_lightBufferDirty = true;
 
 	options.beginColor = Rgba::YELLOW;
-	options.endColor = Rgba::YELLOW;
+	options.endColor = Rgba::YELLOW * 0.4f;
 	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight2Pos, 0.1f, 0.1f, nullptr);
 
 	//Light 4
@@ -840,7 +840,7 @@ void Game::UpdateLightPositions()
 	g_renderContext->m_lightBufferDirty = true;
 
 	options.beginColor = Rgba::MAGENTA;
-	options.endColor = Rgba::MAGENTA;
+	options.endColor = Rgba::MAGENTA * 0.4f;
 	g_debugRenderer->DebugRenderPoint(options, m_dynamicLight3Pos, 0.1f, 0.1f, nullptr);
 
 
