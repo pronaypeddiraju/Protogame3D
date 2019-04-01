@@ -103,12 +103,13 @@ v2f_t VertexFunction(vs_input_t input)
    float4 world_pos = mul( MODEL, local_pos );
    float4 view_pos = mul( VIEW, world_pos ); 
    float4 clip_pos = mul( PROJECTION, view_pos ); 
+   float4 world_normal = mul( MODEL, float4(input.normal, 1.f));
 
    v2f.position = clip_pos; 
    v2f.color = input.color; 
    v2f.uv = input.uv; 
    v2f.worldPos = world_pos.xyz;
-   v2f.normal = mul(MODEL, float4(input.normal, 0.f)).xyz;
+   v2f.normal = world_normal.xyz;
 
    return v2f;
 }
