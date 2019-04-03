@@ -590,7 +590,7 @@ void Game::Render() const
 	g_renderContext->ClearColorTargets(Rgba::BLUE);
 
 	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
-	g_renderContext->SetAmbientLight( Rgba::RED, intensity ); 
+	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
 
 	// enable a point light as some position in the world with a normal quadratic falloff; 
 	if(m_enableDirectional)
@@ -630,11 +630,11 @@ void Game::Render() const
 	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawMesh( m_quad );
-
+	
 	//Render the Quad
 	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(m_baseQuadTransform);
-	g_renderContext->DrawMesh( m_baseQuad );
+	g_renderContext->DrawMesh( m_baseQuad );	
 
 	g_renderContext->EndCamera();
 
@@ -740,7 +740,7 @@ void Game::Update( float deltaTime )
 
 	// Set the cube to rotate around y (which is up currently),
 	// and move the object to the left by 5 units (-x)
-	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(0.0f, 60.0f * currentTime, 0.0f), m_rotationOrder ); 
+	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(60.0f * currentTime, 0.0f, 0.0f), m_rotationOrder ); 
 	m_cubeTransform = Matrix44::SetTranslation3D( Vec3(-5.0f, 0.0f, 0.0f), m_cubeTransform);
 
 	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
@@ -862,7 +862,7 @@ void Game::CreateInitialLight()
 {
 	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
 
-	EnablePointLight(1U, m_dynamicLight0Pos, Vec3(1.f, 0.f, 0.f),Rgba::GREEN);
+	EnablePointLight(1U, m_dynamicLight0Pos, Vec3(1.f, 0.f, 0.5f),Rgba::GREEN);
 	EnablePointLight(2U, m_dynamicLight1Pos, Vec3(0.f, -1.f, 0.f), Rgba::BLUE, 1.f, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
 	EnablePointLight(3U, m_dynamicLight2Pos, Vec3(0.f, 0.f, 1.f), Rgba::YELLOW, 1.f, Vec3(0.f, 1.f, 0.1f), Vec3(0.f, 1.f, 0.1f));
 	EnablePointLight(4U, m_dynamicLight3Pos, Vec3(-1.f, -1.f, 0.f), Rgba::MAGENTA, 1.f, Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, 1.f));
