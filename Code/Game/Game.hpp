@@ -62,6 +62,8 @@ public:
 	void								Shutdown();
 
 	void								Render() const;
+	void								RenderUsingMaterial() const;
+	void								RenderUsingLegacy() const;
 	void								DebugRenderToScreen() const;
 	void								DebugRenderToCamera() const;
 	void								PostRender();
@@ -96,7 +98,7 @@ public:
 	Shader*								m_normalShader = nullptr;
 	Shader*								m_defaultLit = nullptr;
 	std::string							m_defaultShaderPath = "default_unlit.00.hlsl";
-	std::string							m_shaderLitPath = "default_lit.hlsl";
+	std::string							m_shaderLitPath = "default_lit_PCUN.hlsl";
 	std::string							m_normalColorShader = "normal_shader.hlsl";
 	std::string							m_testImagePath = "Test_StbiFlippedAndOpenGL.png";
 	std::string							m_boxTexturePath = "woodcrate.jpg";
@@ -147,4 +149,5 @@ public:
 
 	//Material
 	Material*							m_testMaterial = nullptr;
+	bool								m_useMaterial = true;
 };

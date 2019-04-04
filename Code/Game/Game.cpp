@@ -458,13 +458,8 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 			//Set volume to 0
 			//g_audio->SetSoundPlaybackVolume(m_testPlayback, 0.0f);
 			
-			DebugRenderOptionsT options;
-			//Setup Debug Options
-			options.mode = DEBUG_RENDER_ALWAYS;
-			options.beginColor = Rgba::YELLOW;
-			options.endColor = Rgba::RED;
-			const char* debugText1 = "Debug Log Test";
-			g_debugRenderer->DebugAddToLog(options, debugText1, Rgba::YELLOW, 5.f);
+			//toggle material or not
+			m_useMaterial = !m_useMaterial;
 
 			break;
 		}
@@ -589,7 +584,7 @@ void Game::Render() const
 
 	g_renderContext->BeginCamera(*m_mainCamera); 
 	
-	g_renderContext->ClearColorTargets(Rgba::BLUE);
+	g_renderContext->ClearColorTargets(Rgba::BLACK);
 
 	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
 	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
@@ -604,39 +599,15 @@ void Game::Render() const
 		g_renderContext->EnableDirectionalLight();
 	}
 
-	/*
-	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
-	//g_renderContext->BindShader( m_shader );
-	if(m_normalMode)
+	if(m_useMaterial)
 	{
-		g_renderContext->BindShader( m_normalShader );
+		RenderUsingMaterial();
 	}
 	else
 	{
-		g_renderContext->BindShader( m_defaultLit );
+		RenderUsingLegacy();
 	}
-	
-	//Bind the Texture to be used
-	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
-	*/
 
-	g_renderContext->BindMaterial(m_testMaterial);
-
-	//Render the cube
-	//g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
-	g_renderContext->SetModelMatrix(m_cubeTransform);
-	g_renderContext->DrawMesh( m_cube ); 
-
-	//Render the sphere
-	//g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
-	g_renderContext->SetModelMatrix( m_sphereTransform ); 
-	g_renderContext->DrawMesh( m_sphere ); 
-
-	//Render the Quad
-	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	g_renderContext->DrawMesh( m_quad );
-	
 	/*
 	//Render the Quad
 	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
@@ -660,9 +631,57 @@ void Game::Render() const
 	if(g_devConsole->IsOpen())
 	{	
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
+	}	
+}
+
+void Game::RenderUsingMaterial() const
+{
+	g_renderContext->BindMaterial(m_testMaterial);
+
+	//Render the cube
+	//g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
+	g_renderContext->SetModelMatrix(m_cubeTransform);
+	g_renderContext->DrawMesh( m_cube ); 
+
+	//Render the sphere
+	//g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
+	g_renderContext->SetModelMatrix( m_sphereTransform ); 
+	g_renderContext->DrawMesh( m_sphere ); 
+
+	//Render the Quad
+	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	g_renderContext->DrawMesh( m_quad );
+}
+
+void Game::RenderUsingLegacy() const
+{
+	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
+	//g_renderContext->BindShader( m_shader );
+	if(m_normalMode)
+	{
+		g_renderContext->BindShader( m_normalShader );
+	}
+	else
+	{
+		g_renderContext->BindShader( m_defaultLit );
 	}
 
-	
+	//Render the cube
+	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
+	g_renderContext->SetModelMatrix(m_cubeTransform);
+	g_renderContext->DrawMesh( m_cube ); 
+
+	//Render the sphere
+	g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
+	g_renderContext->SetModelMatrix( m_sphereTransform ); 
+	g_renderContext->DrawMesh( m_sphere ); 
+
+	//Render the Quad
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	g_renderContext->DrawMesh( m_quad );
+
 }
 
 void Game::DebugRenderToScreen() const
@@ -737,7 +756,8 @@ void Game::Update( float deltaTime )
 	const char* text = "Current Time %f";
 	
 	g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
-
+	text = "Toggle Material/Legacy mode using F5";
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 	
 	//Update the camera's transform
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
@@ -748,7 +768,7 @@ void Game::Update( float deltaTime )
 
 	// Set the cube to rotate around y (which is up currently),
 	// and move the object to the left by 5 units (-x)
-	m_cubeTransform = Matrix44::MakeFromEuler( Vec3(60.0f * currentTime, 0.0f, 0.0f), m_rotationOrder ); 
+	//m_cubeTransform = Matrix44::MakeFromEuler( Vec3(60.0f * currentTime, 0.0f, 0.0f), m_rotationOrder ); 
 	m_cubeTransform = Matrix44::SetTranslation3D( Vec3(-5.0f, 0.0f, 0.0f), m_cubeTransform);
 
 	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
@@ -876,8 +896,8 @@ void Game::CreateInitialLight()
 	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
 
 	EnablePointLight(1U, m_dynamicLight0Pos, Vec3(1.f, 0.f, 0.5f),Rgba::GREEN);
-	EnablePointLight(2U, m_dynamicLight1Pos, Vec3(0.f, -1.f, 0.f), Rgba::BLUE, 1.f, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-	EnablePointLight(3U, m_dynamicLight2Pos, Vec3(0.f, 0.f, 1.f), Rgba::YELLOW, 1.f, Vec3(0.f, 1.f, 0.1f), Vec3(0.f, 1.f, 0.1f));
+	EnablePointLight(2U, m_dynamicLight1Pos, Vec3(0.f, -1.f, 0.f), Rgba::BLUE, 1.f, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 0.1f, 0.f));
+	EnablePointLight(3U, m_dynamicLight2Pos, Vec3(0.f, 0.f, 1.f), Rgba::YELLOW, 1.f, Vec3(0.f, 1.f, 0.1f), Vec3(0.f, 0.1f, 0.f));
 	EnablePointLight(4U, m_dynamicLight3Pos, Vec3(-1.f, -1.f, 0.f), Rgba::MAGENTA, 1.f, Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, 1.f));
 }
 
