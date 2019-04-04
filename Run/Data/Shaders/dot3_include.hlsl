@@ -26,7 +26,9 @@ cbuffer light_buffer : register(b4)
 
    float SPEC_FACTOR;   // (0, 1), limits specular amount
    float SPEC_POWER; 
-   float2 pad00; 
+   float EMISSIVE_FACTOR;
+
+   float pad00; 
 
    light_t LIGHTS[MAX_LIGHTS]; 
 };
@@ -38,6 +40,11 @@ struct lighting_t
    float3 specular; 
 };
 
+
+float GetEmissiveFactor()
+{
+	return EMISSIVE_FACTOR;
+}
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

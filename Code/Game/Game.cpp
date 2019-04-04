@@ -74,6 +74,7 @@ void Game::StartUp()
 	g_eventSystem->SubscribeEventCallBackFn("ToggleLight2", ToggleLight2);
 	g_eventSystem->SubscribeEventCallBackFn("ToggleLight3", ToggleLight3);
 	g_eventSystem->SubscribeEventCallBackFn("ToggleLight4", ToggleLight4);
+	g_eventSystem->SubscribeEventCallBackFn("ToggleAllPointLights", ToggleAllPointLights);
 
 	CreateInitialMeshes();
 
@@ -84,8 +85,7 @@ void Game::StartUp()
 	options.space = DEBUG_RENDER_SCREEN;
 	g_debugRenderer->DebugAddToLog(options, "F1 and F2 to increase/decrease ambient light intensity", Rgba::WHITE, 20000.f);
 	g_debugRenderer->DebugAddToLog(options, "F3 to toggle directional light", Rgba::WHITE, 20000.f);
-	g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);
-	g_debugRenderer->DebugAddToLog(options, "", Rgba::WHITE, 20000.f);
+	g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);	
 
 }
 
@@ -363,6 +363,24 @@ bool Game::ToggleLight4( EventArgs& args )
 	return true;
 }
 
+STATIC bool Game::ToggleAllPointLights( EventArgs& args )
+{
+	UNUSED(args);
+	for(int i = 1; i < 5; i++)
+	{
+		if(g_renderContext->m_cpuLightBuffer.lights[i].color.a != 0.f)
+		{
+			g_renderContext->m_cpuLightBuffer.lights[i].color.a = 0.f;
+		}
+		else
+		{
+			g_renderContext->m_cpuLightBuffer.lights[i].color.a = 1.f;
+		}
+	}
+	g_devConsole->PrintString(Rgba::GREEN, "Toggled All Point Lights");
+	return true;
+}
+
 void Game::HandleKeyPressed(unsigned char keyCode)
 {
 	if(g_devConsole->IsOpen())
@@ -374,9 +392,19 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 	switch( keyCode )
 	{
 		case UP_ARROW:
+		{
+			//Increase emissive factor
+			m_emissiveFactor += m_emissiveStep;
+		}
+		break;
+		case DOWN_ARROW:
+		{
+			//decrease emissive factor
+			m_emissiveFactor -= m_emissiveStep;
+		}
+		break;
 		case RIGHT_ARROW:
 		case LEFT_ARROW:
-		case DOWN_ARROW:
 		case SPACE_KEY:
 		case N_KEY:
 		case F1_KEY:
@@ -589,6 +617,9 @@ void Game::Render() const
 	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
 	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
 
+	float emissive = Clamp(m_emissiveFactor, 0.1f, 1.f);
+	g_renderContext->m_cpuLightBuffer.emissiveFactor = emissive;
+
 	// enable a point light as some position in the world with a normal quadratic falloff; 
 	if(m_enableDirectional)
 	{
@@ -755,10 +786,14 @@ void Game::Update( float deltaTime )
 	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
 	const char* text = "Current Time %f";
 	
-	g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
-	text = "Toggle Material/Legacy mode using F5";
+	//g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
+
+	text = "F5 to Toggle Material/Legacy mode";
 	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 	
+	text = "UP/DOWN to increase/decrease emissive factor";
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
+
 	//Update the camera's transform
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);

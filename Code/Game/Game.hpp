@@ -31,6 +31,7 @@ public:
 	static bool ToggleLight2(EventArgs& args);
 	static bool ToggleLight3(EventArgs& args);
 	static bool ToggleLight4(EventArgs& args);
+	static bool ToggleAllPointLights(EventArgs& args);
 
 	void								StartUp();
 	
@@ -150,4 +151,7 @@ public:
 	//Material
 	Material*							m_testMaterial = nullptr;
 	bool								m_useMaterial = true;
+
+	float								m_emissiveFactor = 1.f;
+	float								m_emissiveStep = 0.1f;
 };

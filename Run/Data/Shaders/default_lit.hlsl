@@ -78,8 +78,8 @@ SamplerState sAlbedo : register(s0);      // sampler I'm using for the Albedo te
 Texture2D<float4> tNormalMap : register(t1);   // default "flat" (.5, .5, 1.0)
 SamplerState sNormalMap : register(s1);
 
-//Texture2D<float4> tEmissiveMap : register(t2); // defualt "black"
-//SamplerState sEmissiveMap : register(s2);
+Texture2D<float4> tEmissiveMap : register(t2); // defualt "black"
+SamplerState sEmissiveMap : register(s2);
 
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
@@ -187,8 +187,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
    float4 finalColor = final_color * input.color; 
    
    // EMISSIVE (map defaults to "black"); 
-   //float4 emissive = tEmissiveMap.Sample( sAlbedo, input.uv ) * EMISSIVE_FACTOR; 
-   //final_color += float4(emissive.xyz * emissive.w, 0); 
+   float4 emissive = tEmissiveMap.Sample( sAlbedo, input.uv ) * GetEmissiveFactor(); 
+   finalColor += float4(emissive.xyz * emissive.w, 0); 
 
    //DEBUGGING STUFF
    //float4 finalColor = float4(((normalize(CAMERA_POSITION)) * 0.5f) + 1.f, 0.f);
