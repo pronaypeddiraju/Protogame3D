@@ -1,0 +1,11 @@
+<material id="couch"
+  shader="default_lit.hlsl">
+
+
+  <diffuse src="example_colour.png" />
+  <normal  src="example_normal.png" />  
+
+  <sampler idx="0" type="linear" />
+  <sampler idx="1" type="linear" />
+
+</material>
