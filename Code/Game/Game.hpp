@@ -1,9 +1,10 @@
 //------------------------------------------------------------------------------------------------------------------------------
 #pragma once
 //Engine Systems
-#include "Engine/Math/Vertex_PCU.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/Matrix44.hpp"
+#include "Engine/Math/Vertex_PCU.hpp"
+#include "Engine/Renderer/Material.hpp"
 //Game Systems
 #include "Game/GameCommon.hpp"
 
@@ -37,6 +38,7 @@ public:
 	void								SetupCameras();
 	void								GetandSetShaders();
 	void								LoadGameTextures();
+	void								LoadGameMaterials();
 	void								CreateInitialMeshes();
 	void								CreateInitialLight();
 	void								SetStartupDebugRenderObjects();
@@ -142,4 +144,7 @@ public:
 	
 	//Light movement
 	float								m_ySpeed = 2.f;
+
+	//Material
+	Material*							m_testMaterial = nullptr;
 };

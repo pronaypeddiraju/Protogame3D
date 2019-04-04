@@ -3,9 +3,11 @@
 
 
   <diffuse src="example_colour.png" />
-  <normal  src="example_normal.png" />  
+  <normal  src="example_normal.png" /> 
+  <spec    src="example_spec.png" 	/> 
 
   <sampler idx="0" type="linear" />
   <sampler idx="1" type="linear" />
+  <sampler idx="2" type="linear" />
 
 </material>

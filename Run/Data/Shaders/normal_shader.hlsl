@@ -1,3 +1,5 @@
+#include "dot3_include.hlsl"
+
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -17,6 +19,9 @@ struct vs_input_t
 {
    float3 position      : POSITION;
    float3 normal        : NORMAL;
+   float3 tangent       : TANGENT;
+   float3 biTangent     : BITANGENT;
+
    float4 color         : COLOR; 
    float2 uv            : TEXCOORD; 
 }; 
@@ -40,12 +45,15 @@ cbuffer camera_constants : register(b2)
 {
    float4x4 VIEW; 
    float4x4 PROJECTION; 
+   
+   float3 CAMERA_POSITION;    
+   float cam_unused0;   
 };
 
 //--------------------------------------------------------------------------------------
 cbuffer model_constants : register(b3)
 {
-	float4x4 MODEL;  // LOCAL_TO_WORLD
+   float4x4 MODEL;  // LOCAL_TO_WORLD
 }
 
 //--------------------------------------------------------------------------------------
@@ -67,6 +75,12 @@ cbuffer model_constants : register(b3)
 Texture2D<float4> tAlbedo : register(t0); // texutre I'm using for albedo (color) information
 SamplerState sAlbedo : register(s0);      // sampler I'm using for the Albedo texture
 
+Texture2D<float4> tNormalMap : register(t1);   // default "flat" (.5, .5, 1.0)
+SamplerState sNormalMap : register(s1);
+
+Texture2D<float4> tEmissiveMap : register(t2); // defualt "black"
+SamplerState sEmissiveMap : register(s2);
+
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
 //--------------------------------------------------------------------------------------
@@ -75,16 +89,20 @@ SamplerState sAlbedo : register(s0);      // sampler I'm using for the Albedo te
 // for passing data from vertex to fragment (v-2-f)
 struct v2f_t 
 {
-   float4 position   : SV_POSITION; 
-   float4 normal     : NORMAL;
-   float4 color      : COLOR; 
-   float2 uv         : UV; 
+   float4 position : SV_POSITION; 
+   float3 normal : NORMAL;
+   float3 tangent : TANGENT;
+   float3 biTangent : BITANGENT;
+
+   float3 worldPos : WORLDPOS;
+   float4 color : COLOR; 
+   float2 uv : UV; 
 }; 
 
 //--------------------------------------------------------------------------------------
 float RangeMap( float v, float inMin, float inMax, float outMin, float outMax ) 
 { 
-	return ( ( (v - inMin) * (outMax - outMin) / (inMax - inMin) ) + outMin); 
+   return ( ( (v - inMin) * (outMax - outMin) / (inMax - inMin) ) + outMin); 
 }
 
 //--------------------------------------------------------------------------------------

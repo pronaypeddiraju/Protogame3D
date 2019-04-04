@@ -61,6 +61,8 @@ void Game::StartUp()
 	GetandSetShaders();
 	LoadGameTextures();
 
+	LoadGameMaterials();
+
 	g_devConsole->PrintString(Rgba::BLUE, "this is a test string");
 	g_devConsole->PrintString(Rgba::RED, "this is also a test string");
 	g_devConsole->PrintString(Rgba::GREEN, "damn this dev console lit!");
@@ -602,6 +604,7 @@ void Game::Render() const
 		g_renderContext->EnableDirectionalLight();
 	}
 
+	/*
 	//Bind the shader we are using (This case it's the default shader we made in Shaders folder)
 	//g_renderContext->BindShader( m_shader );
 	if(m_normalMode)
@@ -615,26 +618,31 @@ void Game::Render() const
 	
 	//Bind the Texture to be used
 	g_renderContext->BindTextureViewWithSampler( 0U, m_textureTest); 
+	*/
+
+	g_renderContext->BindMaterial(m_testMaterial);
 
 	//Render the cube
-	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
+	//g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
 	g_renderContext->SetModelMatrix(m_cubeTransform);
 	g_renderContext->DrawMesh( m_cube ); 
 
 	//Render the sphere
-	g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
+	//g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
 	g_renderContext->SetModelMatrix( m_sphereTransform ); 
 	g_renderContext->DrawMesh( m_sphere ); 
 
 	//Render the Quad
-	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawMesh( m_quad );
 	
+	/*
 	//Render the Quad
 	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(m_baseQuadTransform);
 	g_renderContext->DrawMesh( m_baseQuad );	
+	*/
 
 	g_renderContext->EndCamera();
 
@@ -798,6 +806,11 @@ bool Game::IsAlive()
 {
 	//Check if alive
 	return m_isGameAlive;
+}
+
+void Game::LoadGameMaterials()
+{
+	m_testMaterial = g_renderContext->CreateOrGetMaterialFromFile(m_materialPath);
 }
 
 void Game::UpdateLightPositions()
