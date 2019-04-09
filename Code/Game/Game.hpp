@@ -152,6 +152,6 @@ public:
 	Material*							m_testMaterial = nullptr;
 	bool								m_useMaterial = true;
 
-	float								m_emissiveFactor = 1.f;
+	float								m_emissiveFactor = 0.f;
 	float								m_emissiveStep = 0.1f;
 };
