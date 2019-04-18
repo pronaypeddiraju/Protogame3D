@@ -735,6 +735,7 @@ void Game::DebugRenderToCamera() const
 	debugCamera3D.m_colorTargetView = g_renderContext->GetFrameColorTarget();
 
 	g_renderContext->BindShader(m_shader);
+
 	g_renderContext->BeginCamera(debugCamera3D);
 	
 	g_debugRenderer->Setup3DCamera(&debugCamera3D);
