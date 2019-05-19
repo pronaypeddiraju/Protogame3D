@@ -131,6 +131,9 @@ public:
 	GPUMesh*							m_baseQuad = nullptr;
 	Matrix44							m_baseQuadTransform;
 
+	GPUMesh*							m_capsule = nullptr;
+	Matrix44							m_capsuleModel;
+
 	//Lighting Assignment
 	int									m_lightSlot;
 	float								m_ambientIntensity = 1.f;

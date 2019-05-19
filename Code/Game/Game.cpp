@@ -4,7 +4,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
-#include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Core/WindowContext.hpp"
@@ -534,6 +534,9 @@ void Game::Shutdown()
 	delete m_baseQuad;
 	m_baseQuad = nullptr;
 
+	delete m_capsule;
+	m_capsule = nullptr;
+
 	//FreeResources();
 }
 
@@ -650,7 +653,10 @@ void Game::Render() const
 
 	if(!m_consoleDebugOnce)
 	{
-		EventArgs* args = new EventArgs("TestString", "This is a test");
+		EventArgs* args = new EventArgs();
+		std::string key = "TestString";
+		std::string value = "This is a test";
+		args->SetValue(key, value);
 		g_devConsole->Command_Test(*args);
 		g_devConsole->ExecuteCommandLine("Exec Health=25");
 		g_devConsole->ExecuteCommandLine("Exec Health=85 Armor=100");
@@ -683,6 +689,10 @@ void Game::RenderUsingMaterial() const
 	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawMesh( m_quad );
+
+	//Render the capsule here
+	g_renderContext->SetModelMatrix(m_capsuleModel);
+	g_renderContext->DrawMesh(m_capsule);
 }
 
 void Game::RenderUsingLegacy() const
@@ -713,6 +723,9 @@ void Game::RenderUsingLegacy() const
 	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
 	g_renderContext->DrawMesh( m_quad );
 
+	//Render the capsule here
+	g_renderContext->SetModelMatrix(m_capsuleModel);
+	g_renderContext->DrawMesh(m_capsule);
 }
 
 void Game::DebugRenderToScreen() const
@@ -973,6 +986,15 @@ void Game::CreateInitialMeshes()
 	m_baseQuadTransform = Matrix44::IDENTITY;
 	m_baseQuadTransform = Matrix44::MakeFromEuler(Vec3(-90.f, 0.f, 0.f));
 	m_baseQuadTransform = Matrix44::SetTranslation3D(Vec3(0.f, -1.f, 0.f), m_baseQuadTransform);
+
+	mesh.Clear();
+	CPUMeshAddUVCapsule(&mesh, Vec3(0.f, 1.f, 1.f), Vec3(0.f, -1.f, 1.f), 2.f, Rgba::YELLOW);
+
+	m_capsule = new GPUMesh(g_renderContext);
+	m_capsule->CreateFromCPUMesh<Vertex_Lit>(&mesh, GPU_MEMORY_USAGE_STATIC);
+
+	m_capsuleModel = Matrix44::IDENTITY;
+	m_capsuleModel = Matrix44::MakeFromEuler(Vec3(-90.f, 0.f, 0.f));
 }
 
 void Game::LoadGameTextures()
