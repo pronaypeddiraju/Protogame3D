@@ -77,6 +77,8 @@ void App::StartUp()
 	g_debugRenderer = new DebugRender();
 	g_debugRenderer->Startup(g_renderContext);
 
+	g_ImGUI = new ImGUISystem(g_renderContext);
+
 	m_game = new Game();
 	m_game->StartUp();
 	
@@ -85,6 +87,9 @@ void App::StartUp()
 
 void App::ShutDown()
 {
+	delete g_ImGUI;
+	g_ImGUI = nullptr;
+
 	delete g_renderContext;
 	g_renderContext = nullptr;
 
@@ -126,6 +131,7 @@ void App::BeginFrame()
 	g_devConsole->BeginFrame();
 	g_eventSystem->BeginFrame();
 	g_debugRenderer->BeginFrame();
+	g_ImGUI->BeginFrame();
 }
 
 void App::EndFrame()
@@ -136,6 +142,7 @@ void App::EndFrame()
 	g_devConsole->EndFrame();
 	g_eventSystem->EndFrame();
 	g_debugRenderer->EndFrame();
+	g_ImGUI->EndFrame();
 }
 
 void App::Update()
@@ -155,7 +162,7 @@ void App::Update()
 
 void App::Render() const
 {
-	m_game->Render();
+	m_game->Render();	
 }
 
 void App::PostRender()

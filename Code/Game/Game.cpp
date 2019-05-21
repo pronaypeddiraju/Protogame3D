@@ -83,9 +83,9 @@ void Game::StartUp()
 	//Only to keep track of what input does what
 	DebugRenderOptionsT options;
 	options.space = DEBUG_RENDER_SCREEN;
-	g_debugRenderer->DebugAddToLog(options, "F1 and F2 to increase/decrease ambient light intensity", Rgba::WHITE, 20000.f);
-	g_debugRenderer->DebugAddToLog(options, "F3 to toggle directional light", Rgba::WHITE, 20000.f);
-	g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);	
+	//g_debugRenderer->DebugAddToLog(options, "F1 and F2 to increase/decrease ambient light intensity", Rgba::WHITE, 20000.f);
+	//g_debugRenderer->DebugAddToLog(options, "F3 to toggle directional light", Rgba::WHITE, 20000.f);
+	//g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);	
 
 }
 
@@ -94,8 +94,8 @@ void Game::SetupMouseData()
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
 
-	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
-	g_windowContext->HideMouse();
+	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
+	//g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -642,14 +642,15 @@ void Game::Render() const
 		RenderUsingLegacy();
 	}
 
+	g_renderContext->EndCamera();
+
 	/*
 	//Render the Quad
 	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	g_renderContext->SetModelMatrix(m_baseQuadTransform);
 	g_renderContext->DrawMesh( m_baseQuad );	
 	*/
-
-	g_renderContext->EndCamera();
+	
 
 	if(!m_consoleDebugOnce)
 	{
@@ -664,11 +665,34 @@ void Game::Render() const
 
 	//Uncomment to get Debug Rendering to work
 	DebugRenderToCamera();
-	
+
 	if(g_devConsole->IsOpen())
 	{	
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
+
+	g_ImGUI->Render();
+
+}
+
+void Game::CreateTestWidget()
+{
+	ImGui::NewFrame();
+
+	float value = 0.5f;
+	float color[3] = { 0.f, 1.f, 1.f };
+	bool show = true;
+
+	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Demo Window", &show);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Another Window", &show);
+
+	ImGui::SliderFloat("float", &value, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::ColorEdit3("clear color", (float*)&color); // Edit 3 floats representing a color
+
+	ImGui::End();
 }
 
 void Game::RenderUsingMaterial() const
@@ -784,6 +808,8 @@ void Game::Update( float deltaTime )
 
 	UpdateMouseInputs(deltaTime);
 
+	g_ImGUI->BeginFrame();
+
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
 		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
@@ -803,10 +829,10 @@ void Game::Update( float deltaTime )
 	//g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
 
 	text = "F5 to Toggle Material/Legacy mode";
-	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
+	//g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 	
 	text = "UP/DOWN to increase/decrease emissive factor";
-	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
+	//g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 
 	//Update the camera's transform
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
@@ -826,6 +852,15 @@ void Game::Update( float deltaTime )
 	CheckCollisions();
 
 	ClearGarbageEntities();	
+
+	UpdateImGUI();
+}
+
+void Game::UpdateImGUI()
+{
+	//Use this place to create/update info for imGui
+	
+	CreateTestWidget();
 }
 
 //Use this chunk of code only for screen shake!

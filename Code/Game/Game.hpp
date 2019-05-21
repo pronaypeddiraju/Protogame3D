@@ -63,12 +63,14 @@ public:
 	void								Shutdown();
 
 	void								Render() const;
+	void								CreateTestWidget();
 	void								RenderUsingMaterial() const;
 	void								RenderUsingLegacy() const;
 	void								DebugRenderToScreen() const;
 	void								DebugRenderToCamera() const;
 	void								PostRender();
 	void								Update( float deltaTime );
+	void								UpdateImGUI();
 	void								UpdateMouseInputs(float deltaTime);
 	void								UpdateLightPositions();
 	void								UpdateCamera( float deltaTime );
