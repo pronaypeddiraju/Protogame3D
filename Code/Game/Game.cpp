@@ -43,6 +43,7 @@ Game::Game()
 	m_testAudioID = g_audio->CreateOrGetSound("Data/Audio/UproarLilWayne.mp3");
 
 	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
+
 	g_devConsole->SetBitmapFont(*m_squirrelFont);
 	g_debugRenderer->SetDebugFont(m_squirrelFont);
 }
@@ -91,8 +92,8 @@ void Game::StartUp()
 
 void Game::SetupMouseData()
 {
-	IntVec2 clientCenter = g_windowContext->GetClientCenter();
-	g_windowContext->SetClientMousePosition(clientCenter);
+	//IntVec2 clientCenter = g_windowContext->GetClientCenter();
+	//g_windowContext->SetClientMousePosition(clientCenter);
 
 	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
 	//g_windowContext->HideMouse();
@@ -651,6 +652,7 @@ void Game::Render() const
 	g_renderContext->DrawMesh( m_baseQuad );	
 	*/
 	
+	RenderIsoSprite();
 
 	if(!m_consoleDebugOnce)
 	{
@@ -671,8 +673,6 @@ void Game::Render() const
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
 
-	g_ImGUI->Render();
-
 }
 
 void Game::CreateTestWidget()
@@ -689,8 +689,8 @@ void Game::CreateTestWidget()
 	ImGui::Checkbox("Demo Window", &show);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Another Window", &show);
 
-	ImGui::SliderFloat("float", &value, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	ImGui::ColorEdit3("clear color", (float*)&color); // Edit 3 floats representing a color
+	ImGui::SliderFloat("float", &ui_testSlider, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::ColorEdit3("clear color", (float*)&ui_testColor); // Edit 3 floats representing a color
 
 	ImGui::End();
 }
@@ -799,6 +799,8 @@ void Game::PostRender()
 
 	//All screen Debug information
 	DebugRenderToScreen();
+
+	g_ImGUI->Render();
 }
 
 void Game::Update( float deltaTime )
@@ -826,13 +828,13 @@ void Game::Update( float deltaTime )
 	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
 	const char* text = "Current Time %f";
 	
-	//g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::YELLOW, 0.f, currentTime);
 
 	text = "F5 to Toggle Material/Legacy mode";
-	//g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 	
 	text = "UP/DOWN to increase/decrease emissive factor";
-	//g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
+	g_debugRenderer->DebugAddToLog(options, text, Rgba::WHITE, 0.f);
 
 	//Update the camera's transform
 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
@@ -848,6 +850,8 @@ void Game::Update( float deltaTime )
 
 	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
 	m_sphereTransform = Matrix44::SetTranslation3D( Vec3(5.0f, 0.0f, 0.0f), m_sphereTransform);
+
+	m_quadTransfrom = Matrix44::SetTranslation3D(Vec3(0.f, 1.f, -1.f), m_quadTransfrom);
 
 	CheckCollisions();
 
@@ -973,6 +977,28 @@ void Game::UpdateLightPositions()
 
 	g_renderContext->m_cpuLightBuffer.lights[0].position = m_dynamicLight0Pos;
 	*/
+
+	RenderIsoSprite();
+
+}
+
+void Game::RenderIsoSprite() const
+{
+	
+	AABB2 box = AABB2(Vec3(0.f, 0.f, -0.5f), Vec3(1.f, 1.f, 0 - 0.5f));
+	SpriteDefenition* def = m_isoSprite->GetSpriteForLocalDirection(m_testDirection);
+
+	Vec2 mins;
+	Vec2 maxs;
+	def->GetUVs(mins, maxs);
+
+	g_renderContext->BindMaterial(m_testMaterial);
+	TextureView* view = def->GetTexture();
+	g_renderContext->BindTextureViewWithSampler(0U, m_laborerSheet);
+	g_renderContext->SetModelMatrix(m_quadTransfrom);
+	g_renderContext->DrawMesh(m_quad);
+
+	g_renderContext->BindTextureView(0U, nullptr);
 }
 
 void Game::CreateInitialLight()
@@ -1038,6 +1064,46 @@ void Game::LoadGameTextures()
 	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
 	m_boxTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_boxTexturePath);
 	m_sphereTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_sphereTexturePath);
+
+	//Load the sprite sheet from texture (Need to do XML test)
+	m_laborerSheet = g_renderContext->GetOrCreateTextureViewFromFile(m_laborerSheetPath);
+	m_testSheet = new SpriteSheet(m_laborerSheet, m_laborerSheetDim);
+
+	CreateIsoSpriteDefenitions();
+}
+
+void Game::CreateIsoSpriteDefenitions()
+{	
+	std::vector<SpriteDefenition> spriteDefs;
+	std::vector<Vec3> directions;
+
+	Vec3 dir;
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(0), Vec2(0.5, 0.25)));
+	directions.push_back(Vec3(0.f, 0.f, 1.f));
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(16), Vec2(0.5, 0.25)));
+	dir = Vec3(-1.f, 0.f, 1.f).GetNormalized();
+	directions.push_back(dir);
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(32), Vec2(0.5, 0.25)));
+	directions.push_back(Vec3(-1.f, 0.f, 0.f));
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(48), Vec2(0.5, 0.25)));
+	dir = Vec3(-1.f, 0.f, -1.f).GetNormalized();
+	directions.push_back(dir);
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(64), Vec2(0.5, 0.25)));
+	directions.push_back(Vec3(0.f, 0.f, -1.f));
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(80), Vec2(0.5, 0.25)));
+	dir = Vec3(1.f, 0.f, -1.f).GetNormalized();
+	directions.push_back(dir);
+
+	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(96), Vec2(0.5, 0.25)));
+	directions.push_back(Vec3(1.f, 0.f, 0.f));
+	
+	m_isoSprite = new IsoSpriteDefenition(&spriteDefs[0], &directions[0], 7);
 }
 
 void Game::GetandSetShaders()

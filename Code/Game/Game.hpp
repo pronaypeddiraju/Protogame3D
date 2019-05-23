@@ -5,16 +5,18 @@
 #include "Engine/Math/Matrix44.hpp"
 #include "Engine/Math/Vertex_PCU.hpp"
 #include "Engine/Renderer/Material.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/IsoSpriteDefenition.hpp"
 //Game Systems
 #include "Game/GameCommon.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------
 class Texture;
 class BitmapFont;
-class SpriteAnimDefenition;
 class TextureView;
 class Image;
 class Shader;
+class SpriteAnimDefenition;
 class GPUMesh;
 
 struct Camera;
@@ -39,6 +41,7 @@ public:
 	void								SetupCameras();
 	void								GetandSetShaders();
 	void								LoadGameTextures();
+	void								CreateIsoSpriteDefenitions();
 	void								LoadGameMaterials();
 	void								CreateInitialMeshes();
 	void								CreateInitialLight();
@@ -66,6 +69,7 @@ public:
 	void								CreateTestWidget();
 	void								RenderUsingMaterial() const;
 	void								RenderUsingLegacy() const;
+	void								RenderIsoSprite() const;
 	void								DebugRenderToScreen() const;
 	void								DebugRenderToCamera() const;
 	void								PostRender();
@@ -73,7 +77,7 @@ public:
 	void								UpdateImGUI();
 	void								UpdateMouseInputs(float deltaTime);
 	void								UpdateLightPositions();
-	void								UpdateCamera( float deltaTime );
+	void								UpdateCamera(float deltaTime);
 	void								ClearGarbageEntities();
 	void								CheckXboxInputs();
 	void								CheckCollisions();
@@ -129,6 +133,7 @@ public:
 	Matrix44							m_sphereTransform;   // sphere's model matrix
 
 	GPUMesh*							m_quad = nullptr;
+	Matrix44							m_quadTransfrom;
 
 	GPUMesh*							m_baseQuad = nullptr;
 	Matrix44							m_baseQuadTransform;
@@ -159,4 +164,28 @@ public:
 
 	float								m_emissiveFactor = 0.f;
 	float								m_emissiveStep = 0.1f;
+
+	//------------------------------------------------------------------------------------------------------------------------------
+	// User Interface Variables
+	//------------------------------------------------------------------------------------------------------------------------------
+
+	float								ui_testSlider = 0.5f;
+	float								ui_testColor[3] = { 0.f, 0.f, 0.f };
+	float								ui_testCheck1 = false;
+	float								ui_testCheck2 = true;
+
+
+	//------------------------------------------------------------------------------------------------------------------------------
+	// Iso Sprite Test Variables
+	//------------------------------------------------------------------------------------------------------------------------------
+
+	Vec2								m_position = Vec2::ZERO;
+	Vec2								m_targetPosition = Vec2::ZERO;
+	std::string							m_laborerSheetPath = "Laborer_spriteshee_2k.png";
+	TextureView*						m_laborerSheet = nullptr;
+	IntVec2								m_laborerSheetDim = IntVec2(16, 8);
+	SpriteSheet* 						m_testSheet = nullptr;
+	IsoSpriteDefenition*				m_isoSprite = nullptr;
+
+	Vec3								m_testDirection = Vec3::ZERO;
 };
