@@ -92,11 +92,11 @@ void Game::StartUp()
 
 void Game::SetupMouseData()
 {
-	//IntVec2 clientCenter = g_windowContext->GetClientCenter();
-	//g_windowContext->SetClientMousePosition(clientCenter);
+	IntVec2 clientCenter = g_windowContext->GetClientCenter();
+	g_windowContext->SetClientMousePosition(clientCenter);
 
-	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
-	//g_windowContext->HideMouse();
+	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
+	g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -636,12 +636,14 @@ void Game::Render() const
 
 	if(m_useMaterial)
 	{
-		RenderUsingMaterial();
+		//RenderUsingMaterial();
 	}
 	else
 	{
-		RenderUsingLegacy();
+		//RenderUsingLegacy();
 	}
+
+	RenderIsoSprite();
 
 	g_renderContext->EndCamera();
 
@@ -651,8 +653,6 @@ void Game::Render() const
 	g_renderContext->SetModelMatrix(m_baseQuadTransform);
 	g_renderContext->DrawMesh( m_baseQuad );	
 	*/
-	
-	RenderIsoSprite();
 
 	if(!m_consoleDebugOnce)
 	{
@@ -679,15 +679,15 @@ void Game::CreateTestWidget()
 {
 	ImGui::NewFrame();
 
-	float value = 0.5f;
-	float color[3] = { 0.f, 1.f, 1.f };
-	bool show = true;
+	//float value = 0.5f;
+	//float color[3] = { 0.f, 1.f, 1.f };
+	//bool show = true;
 
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Demo Window", &show);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Another Window", &show);
+	ImGui::Checkbox("Demo Window", &ui_testCheck1);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Another Window", &ui_testCheck2);
 
 	ImGui::SliderFloat("float", &ui_testSlider, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 	ImGui::ColorEdit3("clear color", (float*)&ui_testColor); // Edit 3 floats representing a color
@@ -711,12 +711,12 @@ void Game::RenderUsingMaterial() const
 
 	//Render the Quad
 	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	g_renderContext->DrawMesh( m_quad );
+	//g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	//g_renderContext->DrawMesh( m_quad );
 
 	//Render the capsule here
-	g_renderContext->SetModelMatrix(m_capsuleModel);
-	g_renderContext->DrawMesh(m_capsule);
+	//g_renderContext->SetModelMatrix(m_capsuleModel);
+	//g_renderContext->DrawMesh(m_capsule);
 }
 
 void Game::RenderUsingLegacy() const
@@ -808,6 +808,7 @@ void Game::Update( float deltaTime )
 
 	UpdateLightPositions();
 
+	//Figure out update state for only move on alt + move
 	UpdateMouseInputs(deltaTime);
 
 	g_ImGUI->BeginFrame();
@@ -851,7 +852,9 @@ void Game::Update( float deltaTime )
 	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
 	m_sphereTransform = Matrix44::SetTranslation3D( Vec3(5.0f, 0.0f, 0.0f), m_sphereTransform);
 
-	m_quadTransfrom = Matrix44::SetTranslation3D(Vec3(0.f, 1.f, -1.f), m_quadTransfrom);
+	m_quadTransfrom = Matrix44::SetTranslation3D(Vec3(0.f, 0.f, 0.f), m_quadTransfrom);
+
+	//g_debugRenderer->DebugRenderPoint(Vec3(0.f, 0.f, 0.f), 0.f, 1.f);
 
 	CheckCollisions();
 
@@ -984,18 +987,34 @@ void Game::UpdateLightPositions()
 
 void Game::RenderIsoSprite() const
 {
-	
-	AABB2 box = AABB2(Vec3(0.f, 0.f, -0.5f), Vec3(1.f, 1.f, 0 - 0.5f));
+	Vec2 right = Vec2(1.f, 0.f);
+	Vec2 up = Vec2(0.f, 1.f);
+
+	Vec3 mins = Vec3(-m_quadSize * 0.5f, -m_quadSize * 0.5f, 0.f);
+	Vec3 maxs = Vec3(m_quadSize * 0.5f, m_quadSize * 0.5f, 0.f);
+
+	AABB2 box = AABB2(mins, maxs);
+
 	SpriteDefenition* def = m_isoSprite->GetSpriteForLocalDirection(m_testDirection);
 
-	Vec2 mins;
-	Vec2 maxs;
-	def->GetUVs(mins, maxs);
+	Vec2 spriteMins;
+	Vec2 spriteMaxs;
+	def->GetUVs(spriteMins, spriteMaxs);
 
-	g_renderContext->BindMaterial(m_testMaterial);
+	//g_renderContext->BindMaterial(m_testMaterial);
+	spriteMins.y = 1 - spriteMins.y;
+	spriteMaxs.y = 1 - spriteMaxs.y;
+	
+	CPUMesh mesh;
+	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)), Rgba::CLEAR, spriteMins, spriteMaxs);
+	m_quad->CreateFromCPUMesh<Vertex_Lit>(&mesh, GPU_MEMORY_USAGE_STATIC);
+
+	g_renderContext->BindShader(g_renderContext->CreateOrGetShaderFromFile("default_unlit.xml"));
 	TextureView* view = def->GetTexture();
 	g_renderContext->BindTextureViewWithSampler(0U, m_laborerSheet);
+	g_renderContext->BindSampler(SAMPLE_MODE_POINT);
 	g_renderContext->SetModelMatrix(m_quadTransfrom);
+
 	g_renderContext->DrawMesh(m_quad);
 
 	g_renderContext->BindTextureView(0U, nullptr);

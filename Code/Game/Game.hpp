@@ -171,8 +171,8 @@ public:
 
 	float								ui_testSlider = 0.5f;
 	float								ui_testColor[3] = { 0.f, 0.f, 0.f };
-	float								ui_testCheck1 = false;
-	float								ui_testCheck2 = true;
+	bool								ui_testCheck1 = false;
+	bool								ui_testCheck2 = true;
 
 
 	//------------------------------------------------------------------------------------------------------------------------------
@@ -183,9 +183,11 @@ public:
 	Vec2								m_targetPosition = Vec2::ZERO;
 	std::string							m_laborerSheetPath = "Laborer_spriteshee_2k.png";
 	TextureView*						m_laborerSheet = nullptr;
-	IntVec2								m_laborerSheetDim = IntVec2(16, 8);
+	IntVec2								m_laborerSheetDim = IntVec2(16, 16);
 	SpriteSheet* 						m_testSheet = nullptr;
 	IsoSpriteDefenition*				m_isoSprite = nullptr;
+
+	float								m_quadSize = 1.f;
 
 	Vec3								m_testDirection = Vec3::ZERO;
 };
