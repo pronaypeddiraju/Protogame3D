@@ -189,5 +189,5 @@ public:
 
 	float								m_quadSize = 1.f;
 
-	Vec3								m_testDirection = Vec3::ZERO;
+	Vec3								m_testDirection = Vec3(0.f, 0.f, 1.f);
 };

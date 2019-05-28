@@ -92,11 +92,11 @@ void Game::StartUp()
 
 void Game::SetupMouseData()
 {
-	IntVec2 clientCenter = g_windowContext->GetClientCenter();
-	g_windowContext->SetClientMousePosition(clientCenter);
+	//IntVec2 clientCenter = g_windowContext->GetClientCenter();
+	//g_windowContext->SetClientMousePosition(clientCenter);
 
-	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
-	g_windowContext->HideMouse();
+	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
+	//g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -616,7 +616,7 @@ void Game::Render() const
 
 	g_renderContext->BeginCamera(*m_mainCamera); 
 	
-	g_renderContext->ClearColorTargets(Rgba::BLACK);
+	g_renderContext->ClearColorTargets(Rgba(ui_testColor[0], ui_testColor[1], ui_testColor[2], 1.f));
 
 	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
 	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
@@ -711,12 +711,12 @@ void Game::RenderUsingMaterial() const
 
 	//Render the Quad
 	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	//g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	//g_renderContext->DrawMesh( m_quad );
+	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	g_renderContext->DrawMesh( m_quad );
 
 	//Render the capsule here
-	//g_renderContext->SetModelMatrix(m_capsuleModel);
-	//g_renderContext->DrawMesh(m_capsule);
+	g_renderContext->SetModelMatrix(m_capsuleModel);
+	g_renderContext->DrawMesh(m_capsule);
 }
 
 void Game::RenderUsingLegacy() const
@@ -856,6 +856,8 @@ void Game::Update( float deltaTime )
 
 	//g_debugRenderer->DebugRenderPoint(Vec3(0.f, 0.f, 0.f), 0.f, 1.f);
 
+	m_testDirection = m_testDirection.GetRotatedAboutYDegrees(currentTime * ui_testSlider);
+
 	CheckCollisions();
 
 	ClearGarbageEntities();	
@@ -981,7 +983,7 @@ void Game::UpdateLightPositions()
 	g_renderContext->m_cpuLightBuffer.lights[0].position = m_dynamicLight0Pos;
 	*/
 
-	RenderIsoSprite();
+	//RenderIsoSprite();
 
 }
 
@@ -1006,13 +1008,12 @@ void Game::RenderIsoSprite() const
 	spriteMaxs.y = 1 - spriteMaxs.y;
 	
 	CPUMesh mesh;
-	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)), Rgba::CLEAR, spriteMins, spriteMaxs);
+	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)), Rgba::WHITE, spriteMins, spriteMaxs);
 	m_quad->CreateFromCPUMesh<Vertex_Lit>(&mesh, GPU_MEMORY_USAGE_STATIC);
 
 	g_renderContext->BindShader(g_renderContext->CreateOrGetShaderFromFile("default_unlit.xml"));
 	TextureView* view = def->GetTexture();
-	g_renderContext->BindTextureViewWithSampler(0U, m_laborerSheet);
-	g_renderContext->BindSampler(SAMPLE_MODE_POINT);
+	g_renderContext->BindTextureView(0U, m_laborerSheet);
 	g_renderContext->SetModelMatrix(m_quadTransfrom);
 
 	g_renderContext->DrawMesh(m_quad);
@@ -1080,12 +1081,12 @@ void Game::CreateInitialMeshes()
 void Game::LoadGameTextures()
 {
 	//Get the test texture
-	m_textureTest = g_renderContext->GetOrCreateTextureViewFromFile(m_testImagePath);
-	m_boxTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_boxTexturePath);
-	m_sphereTexture = g_renderContext->GetOrCreateTextureViewFromFile(m_sphereTexturePath);
+	m_textureTest = g_renderContext->CreateOrGetTextureViewFromFile(m_testImagePath);
+	m_boxTexture = g_renderContext->CreateOrGetTextureViewFromFile(m_boxTexturePath);
+	m_sphereTexture = g_renderContext->CreateOrGetTextureViewFromFile(m_sphereTexturePath);
 
 	//Load the sprite sheet from texture (Need to do XML test)
-	m_laborerSheet = g_renderContext->GetOrCreateTextureViewFromFile(m_laborerSheetPath);
+	m_laborerSheet = g_renderContext->CreateOrGetTextureViewFromFile(m_laborerSheetPath);
 	m_testSheet = new SpriteSheet(m_laborerSheet, m_laborerSheetDim);
 
 	CreateIsoSpriteDefenitions();
