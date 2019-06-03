@@ -9,6 +9,7 @@
 #include "Engine/Renderer/IsoSpriteDefenition.hpp"
 //Game Systems
 #include "Game/GameCommon.hpp"
+//Third Party
 
 //------------------------------------------------------------------------------------------------------------------------------
 class Texture;
@@ -46,6 +47,7 @@ public:
 	void								CreateInitialMeshes();
 	void								CreateInitialLight();
 	void								SetStartupDebugRenderObjects();
+	void								SetupPhysX();
 
 
 	void								HandleKeyPressed( unsigned char keyCode );
@@ -173,6 +175,14 @@ public:
 	float								ui_testColor[3] = { 0.f, 0.f, 0.f };
 	bool								ui_testCheck1 = false;
 	bool								ui_testCheck2 = true;
+
+
+	//------------------------------------------------------------------------------------------------------------------------------
+	// PhysX Test Variables
+	//------------------------------------------------------------------------------------------------------------------------------
+
+	//NxPhysicsSDK*						pPhysics; //declare globally
+
 
 
 	//------------------------------------------------------------------------------------------------------------------------------

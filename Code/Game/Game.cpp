@@ -293,6 +293,12 @@ void Game::SetStartupDebugRenderObjects()
 	g_debugRenderer->DebugAddToLog(options, debugText2, Rgba::GREEN, 20.f);
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
+void Game::SetupPhysX()
+{
+	
+}
+
 STATIC bool Game::TestEvent(EventArgs& args)
 {
 	UNUSED(args);
@@ -1013,7 +1019,7 @@ void Game::RenderIsoSprite() const
 
 	g_renderContext->BindShader(g_renderContext->CreateOrGetShaderFromFile("default_unlit.xml"));
 	TextureView* view = def->GetTexture();
-	g_renderContext->BindTextureView(0U, m_laborerSheet);
+	g_renderContext->BindTextureView(0U, view);
 	g_renderContext->SetModelMatrix(m_quadTransfrom);
 
 	g_renderContext->DrawMesh(m_quad);
