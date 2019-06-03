@@ -25,6 +25,8 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 
+#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
+
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
 //Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
