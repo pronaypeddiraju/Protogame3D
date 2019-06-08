@@ -25,7 +25,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 
-#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
+//#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
 //------------------------------------------------------------------------------------------------------------------------------
 //Create Camera and set to null 
@@ -796,7 +796,7 @@ void Game::PostRender()
 
 	if(!m_isDebugSetup)
 	{
-		//SetStartupDebugRenderObjects();
+		SetStartupDebugRenderObjects();
 
 		ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
 		//Setup debug render client data
@@ -1005,22 +1005,13 @@ void Game::RenderIsoSprite() const
 
 	AABB2 box = AABB2(mins, maxs);
 
-	SpriteDefenition* def = m_isoSprite->GetSpriteForLocalDirection(m_testDirection);
-
-	Vec2 spriteMins;
-	Vec2 spriteMaxs;
-	def->GetUVs(spriteMins, spriteMaxs);
-
-	//g_renderContext->BindMaterial(m_testMaterial);
-	spriteMins.y = 1 - spriteMins.y;
-	spriteMaxs.y = 1 - spriteMaxs.y;
-	
 	CPUMesh mesh;
-	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)), Rgba::WHITE, spriteMins, spriteMaxs);
+	CPUMeshAddQuad(&mesh, AABB2(Vec2(-0.5f, -0.5f), Vec2(0.5f, 0.5f)), Rgba::WHITE);
 	m_quad->CreateFromCPUMesh<Vertex_Lit>(&mesh, GPU_MEMORY_USAGE_STATIC);
 
 	g_renderContext->BindShader(g_renderContext->CreateOrGetShaderFromFile("default_unlit.xml"));
-	TextureView* view = def->GetTexture();
+	//TextureView* view = def->GetTexture();
+	TextureView* view = m_laborerSheet;
 	g_renderContext->BindTextureView(0U, view);
 	g_renderContext->SetModelMatrix(m_quadTransfrom);
 
@@ -1131,7 +1122,7 @@ void Game::CreateIsoSpriteDefenitions()
 	spriteDefs.push_back(SpriteDefenition(m_testSheet->GetSpriteDef(96), Vec2(0.5, 0.25)));
 	directions.push_back(Vec3(1.f, 0.f, 0.f));
 	
-	m_isoSprite = new IsoSpriteDefenition(&spriteDefs[0], &directions[0], 7);
+	//m_isoSprite = new IsoSpriteDefenition(&spriteDefs[0], &directions[0], 7);
 }
 
 void Game::GetandSetShaders()
