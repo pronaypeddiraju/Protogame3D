@@ -644,11 +644,11 @@ void Game::Render() const
 
 	if(m_useMaterial)
 	{
-		//RenderUsingMaterial();
+		RenderUsingMaterial();
 	}
 	else
 	{
-		//RenderUsingLegacy();
+		RenderUsingLegacy();
 	}
 
 	RenderIsoSprite();
@@ -681,26 +681,6 @@ void Game::Render() const
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
 
-}
-
-void Game::CreateTestWidget()
-{
-	ImGui::NewFrame();
-
-	//float value = 0.5f;
-	//float color[3] = { 0.f, 1.f, 1.f };
-	//bool show = true;
-
-	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Demo Window", &ui_testCheck1);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Another Window", &ui_testCheck2);
-
-	ImGui::SliderFloat("float", &ui_testSlider, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	ImGui::ColorEdit3("clear color", (float*)&ui_testColor); // Edit 3 floats representing a color
-
-	ImGui::End();
 }
 
 void Game::RenderUsingMaterial() const
@@ -796,7 +776,7 @@ void Game::PostRender()
 
 	if(!m_isDebugSetup)
 	{
-		SetStartupDebugRenderObjects();
+		//SetStartupDebugRenderObjects();
 
 		ColorTargetView* ctv = g_renderContext->GetFrameColorTarget();
 		//Setup debug render client data
@@ -873,11 +853,22 @@ void Game::Update( float deltaTime )
 	UpdateImGUI();
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
 void Game::UpdateImGUI()
 {
 	//Use this place to create/update info for imGui
-	
-	CreateTestWidget();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Demo Window", &ui_testCheck1);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Another Window", &ui_testCheck2);
+
+	ImGui::SliderFloat("float", &ui_testSlider, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::ColorEdit3("clear color", (float*)&ui_testColor); // Edit 3 floats representing a color
+
+	ImGui::End();
 }
 
 //Use this chunk of code only for screen shake!

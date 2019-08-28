@@ -68,7 +68,6 @@ public:
 	void								Shutdown();
 
 	void								Render() const;
-	void								CreateTestWidget();
 	void								RenderUsingMaterial() const;
 	void								RenderUsingLegacy() const;
 	void								RenderIsoSprite() const;
