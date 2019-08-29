@@ -24,6 +24,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Commons/UnitTest.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -36,6 +37,7 @@ float g_shakeAmount = 0.0f;
 RandomNumberGenerator* g_randomNumGen;
 extern RenderContext* g_renderContext;	// Declare these first
 extern AudioSystem* g_audio;
+extern uint gTestCount;
 bool g_debugMode = false;
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -83,20 +85,20 @@ void Game::StartUp()
 
 	CreateInitialLight();
 
-	//Only to keep track of what input does what
-	DebugRenderOptionsT options;
-	options.space = DEBUG_RENDER_SCREEN;
-	//g_debugRenderer->DebugAddToLog(options, "F1 and F2 to increase/decrease ambient light intensity", Rgba::WHITE, 20000.f);
-	//g_debugRenderer->DebugAddToLog(options, "F3 to toggle directional light", Rgba::WHITE, 20000.f);
-	//g_debugRenderer->DebugAddToLog(options, "F4 to toggle normal or lit shaders", Rgba::WHITE, 20000.f);	
+	UnitTestRunAllCategories();
+}
 
+UNITTEST("TestUnitTest", "RandomTest", 1)
+{
+	CONFIRM(CosDegrees(0.f) == 1.f);
+
+	return true;
 }
 
 void Game::SetupMouseData()
 {
 	//IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	//g_windowContext->SetClientMousePosition(clientCenter);
-
 	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
 	//g_windowContext->HideMouse();
 }
@@ -115,10 +117,8 @@ void Game::SetupCameras()
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
-	//m_mainCamera->SetOrthoView(Vec2(-10.f * SCREEN_ASPECT, -10.f), Vec2(10.f * SCREEN_ASPECT, 10.f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
-
 }
 
 void Game::SetStartupDebugRenderObjects()
