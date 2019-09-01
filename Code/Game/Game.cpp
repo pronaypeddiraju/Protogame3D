@@ -25,6 +25,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Commons/UnitTest.hpp"
+#include "Engine/Commons/Callstack.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -86,9 +87,11 @@ void Game::StartUp()
 	CreateInitialLight();
 
 	UnitTestRunAllCategories();
+
+	Callstack callStackObject = CallstackGet();
 }
 
-UNITTEST("TestUnitTest", "RandomTest", 1)
+UNITTEST("TestUnitTest", "RandomTest", 100)
 {
 	CONFIRM(CosDegrees(0.f) == 1.f);
 
