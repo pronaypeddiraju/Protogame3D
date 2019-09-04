@@ -87,8 +87,8 @@ void Game::StartUp()
 	CreateInitialLight();
 
 	UnitTestRunAllCategories(10);
-	UnitTestRun("TestCategory", 10);
-	UnitTestRun("AnotherTestCategory", 10);
+	//UnitTestRun("TestCategory", 10);
+	//UnitTestRun("AnotherTestCategory", 10);
 }
 
 UNITTEST("TestUnitTest", "TestCategory", 1)
