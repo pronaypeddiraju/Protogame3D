@@ -4,6 +4,7 @@
 #include "Engine/Math/IntVec2.hpp"
 #include <vector>
 #include <stack>
+#include <tuple>
 
 //------------------------------------------------------------------------------------------------------------------------------
 class Model
@@ -13,6 +14,10 @@ public:
 
 	void	Startup();
 	bool	Observe();
+	void	Ban(int waveIndex, int weightIndex);
+	void	Propagate();
+
+	virtual bool	OnBoundary(int x, int y) = 0;
 
 private:
 	//wave
@@ -27,7 +32,9 @@ private:
 	int							m_numPropagationBlocks = 0;
 
 	//Stack
-	std::stack<int>	m_stack;
+	//std::map<int, int>	m_stack;
+	//int m_stackSize = 0;
+	//Figure a good way to do tuples here
 
 	//Generator Variables
 	int					m_randomSeed = 0;

@@ -49,12 +49,10 @@ bool Model::Observe()
 	for (int i = 0; i < m_waveArray.GetWidth(); i++)
 	{
 		TODO("Make OnBoundary");
-		/*
 		if (OnBoundary(i % m_modelDimensions.x, i / m_modelDimensions.x))
 		{
 			continue;
 		}
-		*/
 
 		int amount = m_sumOfOnes[i];
 		if (amount == 0)
@@ -77,13 +75,13 @@ bool Model::Observe()
 
 	if (argmin == -1)
 	{
-		for (int i = 0; i < m_waveArray.GetWidth(); i++)
+		for (int blockIndex = 0; blockIndex < m_waveArray.GetWidth(); blockIndex++)
 		{
-			for (int t = 0; t < m_numWeights; t++)
+			for (int weightIndex = 0; weightIndex < m_numWeights; weightIndex++)
 			{
-				if (m_waveArray.ContainsCell(IntVec2(i, t)))
+				if (m_waveArray.ContainsCell(IntVec2(blockIndex, weightIndex)))
 				{
-					m_observedBlocks[i] = t;
+					m_observedBlocks[blockIndex] = weightIndex;
 					break;
 				}
 			}
@@ -95,23 +93,50 @@ bool Model::Observe()
 
 	std::vector<double> distribution;
 	distribution.resize(sizeof(double) * m_numWeights);
-	for (int t = 0; t < m_numWeights; t++)
+	for (int weightIndex = 0; weightIndex < m_numWeights; weightIndex++)
 	{
-		distribution[t] = m_waveArray.ContainsCell(IntVec2(argmin, t)) ? m_weights[t] : 0;
+		distribution[weightIndex] = m_waveArray.ContainsCell(IntVec2(argmin, weightIndex)) ? m_weights[weightIndex] : 0;
 	}
 
-	int r = (int)distribution[g_RNG->GetRandomIntInRange(0, (int)distribution.size() - 1)];
+	int randomInt = (int)distribution[g_RNG->GetRandomIntInRange(0, (int)distribution.size() - 1)];
 
-	TODO("Fix this part of the WFC code to account for a 2D array of bools");
-	//Need to fix this!
-	/*
-	bool w = m_waveArray.Get(IntVec2(argmin, 0));
-	for (int t = 0; t < m_numWeights; t++)
+	std::vector<bool> waveStates(argmin, false);
+	for (int weightIndex = 0; weightIndex < m_numWeights; weightIndex++)
 	{
-		if (w[t] != (t == r)) 
-			Ban(argmin, t);
+		if (waveStates[weightIndex] != (weightIndex == randomInt))
+		{
+			Ban(argmin, weightIndex);
+		}
 	}
-	*/
-
+	
 	return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+void Model::Ban(int waveIndex, int weightIndex)
+{
+	m_waveArray.Set(IntVec2(waveIndex, weightIndex), false);
+
+	std::vector<int> comp = m_compatibleBlocks.Get(IntVec2(waveIndex, weightIndex));
+	for (int d = 0; d < 4; d++)
+	{
+		comp[d] = 0;
+	}
+	
+	TODO("Create the tuple and push it in the stack");
+	//m_stack.push()
+	//stacksize++;
+
+	m_sumOfOnes[waveIndex] -= 1;
+	m_sumsOfWeights[waveIndex] -= m_weights[weightIndex];
+	m_sumsOfWeightLogWeights[waveIndex] -= m_weightLogWeights[weightIndex];
+
+	double sum = m_sumsOfWeights[waveIndex];
+	m_entropies[waveIndex] = log(sum) - m_sumsOfWeightLogWeights[waveIndex] / sum;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+void Model::Propagate()
+{
+
 }

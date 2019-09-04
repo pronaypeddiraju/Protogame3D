@@ -86,14 +86,24 @@ void Game::StartUp()
 
 	CreateInitialLight();
 
-	UnitTestRunAllCategories();
+	UnitTestRunAllCategories(10);
+	UnitTestRun("TestCategory", 10);
+	UnitTestRun("AnotherTestCategory", 10);
 }
 
-UNITTEST("TestUnitTest", "RandomTest", 100)
+UNITTEST("TestUnitTest", "TestCategory", 1)
 {
 	CONFIRM(CosDegrees(0.f) == 1.f);
-	Callstack callStackObject = CallstackGet();
 
+	Callstack callStackObject = CallstackGet();
+	return true;
+}
+
+UNITTEST("AnotherTestUnitTest", "AnotherTestCategory", 5)
+{
+	CONFIRM(CosDegrees(10.f) != 1.f);
+
+	Callstack callStackObject = CallstackGet();
 	return true;
 }
 
