@@ -87,22 +87,22 @@ void Game::StartUp()
 	CreateInitialLight();
 
 	UnitTestRunAllCategories();
-
-	Callstack callStackObject = CallstackGet();
 }
 
 UNITTEST("TestUnitTest", "RandomTest", 100)
 {
 	CONFIRM(CosDegrees(0.f) == 1.f);
+	Callstack callStackObject = CallstackGet();
 
 	return true;
 }
 
 void Game::SetupMouseData()
 {
-	//IntVec2 clientCenter = g_windowContext->GetClientCenter();
-	//g_windowContext->SetClientMousePosition(clientCenter);
+	IntVec2 clientCenter = g_windowContext->GetClientCenter();
+	g_windowContext->SetClientMousePosition(clientCenter);
 	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
+	
 	//g_windowContext->HideMouse();
 }
 
