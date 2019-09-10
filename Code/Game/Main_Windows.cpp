@@ -31,6 +31,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 // This function is called by Windows whenever we ask it for notifications
 static bool AppWindowProc( void* windowHandle, uint32_t wmMessageCode, uintptr_t wParam, uintptr_t lParam )
 {
+
 	if (g_ImGUI != nullptr)
 	{
 		bool imguiHandled = ImGui_ImplWin32_WndProcHandler((HWND)windowHandle, wmMessageCode, wParam, lParam);
