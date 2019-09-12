@@ -96,6 +96,7 @@ UNITTEST("TestUnitTest", "TestCategory", 1)
 	CONFIRM(CosDegrees(0.f) == 1.f);
 
 	Callstack callStackObject = CallstackGet();
+	CallstackToString(callStackObject);
 	return true;
 }
 
@@ -104,6 +105,7 @@ UNITTEST("AnotherTestUnitTest", "AnotherTestCategory", 5)
 	CONFIRM(CosDegrees(10.f) != 1.f);
 
 	Callstack callStackObject = CallstackGet();
+	CallstackToString(callStackObject);
 	return true;
 }
 
@@ -111,9 +113,9 @@ void Game::SetupMouseData()
 {
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
-	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
+	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
 	
-	//g_windowContext->HideMouse();
+	g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -687,7 +689,7 @@ void Game::Render() const
 	}
 
 	//Uncomment to get Debug Rendering to work
-	DebugRenderToCamera();
+	//DebugRenderToCamera();
 
 	if(g_devConsole->IsOpen())
 	{	

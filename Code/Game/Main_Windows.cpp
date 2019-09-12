@@ -35,6 +35,7 @@ static bool AppWindowProc( void* windowHandle, uint32_t wmMessageCode, uintptr_t
 	if (g_ImGUI != nullptr)
 	{
 		bool imguiHandled = ImGui_ImplWin32_WndProcHandler((HWND)windowHandle, wmMessageCode, wParam, lParam);
+		UNUSED(imguiHandled);
 		const ImGuiIO& io = ImGui::GetIO();
 
 		switch (wmMessageCode)
