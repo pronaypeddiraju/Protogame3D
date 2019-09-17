@@ -26,6 +26,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Commons/UnitTest.hpp"
 #include "Engine/Commons/Callstack.hpp"
+#include "Engine/Core/Async/UniformAsyncRingBuffer.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -89,9 +90,16 @@ void Game::StartUp()
 	UnitTestRunAllCategories(10);
 	//UnitTestRun("TestCategory", 10);
 	//UnitTestRun("AnotherTestCategory", 10);
+
+	UniformAsyncRingBuffer<uint> ringBuffer(10);
+
+	ringBuffer.Insert(5);
+	DebuggerPrintf("\n Ring Buffer Value: %d", ringBuffer.ReadBuffer());
+	ringBuffer.ResetBuffer();
+	DebuggerPrintf("\n Ring Buffer Value: %d \n", ringBuffer.ReadBuffer());
 }
 
-UNITTEST("TestUnitTest", "TestCategory", 1)
+UNITTEST("TestUnitTest", "TestCategory", 10)
 {
 	CONFIRM(CosDegrees(0.f) == 1.f);
 
@@ -100,7 +108,7 @@ UNITTEST("TestUnitTest", "TestCategory", 1)
 	return true;
 }
 
-UNITTEST("AnotherTestUnitTest", "AnotherTestCategory", 5)
+UNITTEST("AnotherTestUnitTest", "AnotherTestCategory", 50)
 {
 	CONFIRM(CosDegrees(10.f) != 1.f);
 
