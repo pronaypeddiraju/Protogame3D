@@ -2,6 +2,7 @@
 #include "Game/App.hpp"
 //Engine Systems
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Commons/LogSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
 #include "Engine/Core/NamedStrings.hpp"
@@ -60,6 +61,9 @@ void App::StartUp()
 {
 	LoadGameBlackBoard();
 
+	g_LogSystem = new LogSystem(LOG_PATH);
+	g_LogSystem->LogSystemInit();
+
 	g_eventSystem = new EventSystems();
 
 	//This is now being set in Main_Windows.cpp
@@ -81,6 +85,8 @@ void App::StartUp()
 	g_ImGUI = new ImGUISystem(g_renderContext);
 
 	g_RNG = new RandomNumberGenerator();
+
+	g_LogSystem->Logf("Game", "Starting Game");
 
 	m_game = new Game();
 	m_game->StartUp();
@@ -113,6 +119,10 @@ void App::ShutDown()
 
 	delete g_RNG;
 	g_RNG = nullptr;
+
+	g_LogSystem->LogSystemShutDown();
+	delete g_LogSystem;
+	g_LogSystem = nullptr;
 
 	m_game->Shutdown();
 }

@@ -55,5 +55,4 @@ private:
 
 	double		m_timeAtLastFrameBegin = 0;
 	double		m_timeAtThisFrameBegin = 0;
-
 };

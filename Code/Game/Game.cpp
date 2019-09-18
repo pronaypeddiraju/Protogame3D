@@ -104,7 +104,7 @@ UNITTEST("TestUnitTest", "TestCategory", 10)
 	CONFIRM(CosDegrees(0.f) == 1.f);
 
 	Callstack callStackObject = CallstackGet();
-	CallstackToString(callStackObject);
+	GetCallstackToString(callStackObject);
 	return true;
 }
 
@@ -113,7 +113,7 @@ UNITTEST("AnotherTestUnitTest", "AnotherTestCategory", 50)
 	CONFIRM(CosDegrees(10.f) != 1.f);
 
 	Callstack callStackObject = CallstackGet();
-	CallstackToString(callStackObject);
+	GetCallstackToString(callStackObject);
 	return true;
 }
 
