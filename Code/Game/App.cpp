@@ -86,6 +86,7 @@ void App::StartUp()
 
 	g_RNG = new RandomNumberGenerator();
 
+	g_LogSystem->LogHook(&LogHookForDevConsole);
 	g_LogSystem->Logf("Game", "Starting Game");
 
 	m_game = new Game();
