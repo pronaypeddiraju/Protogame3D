@@ -34,6 +34,8 @@
 //Create Camera and set to null 
 //Camera *g_mainCamera = nullptr; // Define these next, and group by data type - primitives first, structs next, classes next; spaces only necessary if there are clear categories
 
+#define LOG_MESSAGES_PER_THREAD_TEST   (1024)
+
 float g_shakeAmount = 0.0f;
 
 RandomNumberGenerator* g_randomNumGen;
@@ -60,6 +62,45 @@ Game::~Game()
 	Shutdown();
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
+static void LogTest()
+{
+	std::thread::id this_id = std::this_thread::get_id();
+	size_t hash_id = std::hash<std::thread::id>{}(this_id);
+	char const* format = "Thread[%llu]: Printing Message %u";
+
+	for (uint i = 0; i < LOG_MESSAGES_PER_THREAD_TEST; ++i) 
+	{
+		if (g_RNG->GetRandomFloatInRange(0.f, 1.f) < 0.5f )
+		{
+			g_LogSystem->LogCallstackf("debug", format, hash_id, i);
+		}
+		else 
+		{
+			g_LogSystem->Logf("debug", format, hash_id, i);
+		}
+
+		DebuggerPrintf(format, hash_id);
+		DebuggerPrintf("\n Thread Test Iteration : %d ", i);
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+STATIC bool Game::LogThreadTest(EventArgs& args)
+{
+	UNUSED(args);
+
+	// leave one thread free (main thread)
+	uint core_count = std::thread::hardware_concurrency() - 1;
+	for (uint i = 0; i < core_count; ++i)
+	{
+		std::thread test_thread(LogTest);
+		test_thread.detach();
+	}
+
+	return true;
+}
+
 void Game::StartUp()
 {
 	SetupMouseData();
@@ -82,6 +123,7 @@ void Game::StartUp()
 	g_eventSystem->SubscribeEventCallBackFn("ToggleLight3", ToggleLight3);
 	g_eventSystem->SubscribeEventCallBackFn("ToggleLight4", ToggleLight4);
 	g_eventSystem->SubscribeEventCallBackFn("ToggleAllPointLights", ToggleAllPointLights);
+	g_eventSystem->SubscribeEventCallBackFn("LogThreadTest", LogThreadTest);
 
 	CreateInitialMeshes();
 
@@ -97,6 +139,14 @@ void Game::StartUp()
 	DebuggerPrintf("\n Ring Buffer Value: %d", ringBuffer.ReadBuffer());
 	ringBuffer.ResetBuffer();
 	DebuggerPrintf("\n Ring Buffer Value: %d \n", ringBuffer.ReadBuffer());
+}
+
+UNITTEST("LogFlushTest", "LoggingSystem", 0)
+{
+	g_LogSystem->Logf("PrintFilter", "I am a Logf call");
+	g_LogSystem->Logf("FlushFilter", "I am now calling flush");
+	g_LogSystem->LogFlush();
+	return true;
 }
 
 UNITTEST("TestUnitTest", "TestCategory", 10)
@@ -379,7 +429,7 @@ STATIC bool Game::ToggleLight3( EventArgs& args )
 	return true;
 }
 
-bool Game::ToggleLight4( EventArgs& args )
+STATIC bool Game::ToggleLight4( EventArgs& args )
 {
 	UNUSED(args);
 	if(g_renderContext->m_cpuLightBuffer.lights[4].color.a != 0.f)
@@ -412,6 +462,8 @@ STATIC bool Game::ToggleAllPointLights( EventArgs& args )
 	g_devConsole->PrintString(Rgba::GREEN, "Toggled All Point Lights");
 	return true;
 }
+
+
 
 void Game::HandleKeyPressed(unsigned char keyCode)
 {

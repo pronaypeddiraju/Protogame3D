@@ -35,6 +35,7 @@ public:
 	static bool ToggleLight3(EventArgs& args);
 	static bool ToggleLight4(EventArgs& args);
 	static bool ToggleAllPointLights(EventArgs& args);
+	static bool LogThreadTest(EventArgs& args);
 
 	void								StartUp();
 	
