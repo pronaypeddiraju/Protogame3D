@@ -141,13 +141,37 @@ void Game::StartUp()
 	DebuggerPrintf("\n Ring Buffer Value: %d \n", ringBuffer.ReadBuffer());
 }
 
-UNITTEST("LogFlushTest", "LoggingSystem", 0)
+UNITTEST("LogFlushTest", "LoggingSystem", 30)
 {
 	g_LogSystem->Logf("PrintFilter", "I am a Logf call");
 	g_LogSystem->Logf("FlushFilter", "I am now calling flush");
 	g_LogSystem->LogFlush();
 	return true;
 }
+
+UNITTEST("LogFilterTest", "LoggingSystem", 0)
+{
+	g_LogSystem->LogEnableAll();
+	g_LogSystem->Logf("testFilter", "I am a testFilter String");
+	g_LogSystem->LogFlush();
+	
+	g_LogSystem->LogDisableAll();
+	g_LogSystem->Logf("testFilter", "I am also a testFilter String");
+	g_LogSystem->LogFlush();
+	
+	g_LogSystem->LogEnable("testFilter");
+	g_LogSystem->Logf("testFilter", "I am a testFilter who was written to log");
+	g_LogSystem->LogFlush();
+
+	g_LogSystem->LogEnable("AnotherTestFilter");
+	g_LogSystem->Logf("AnotherTestFilter", "I am a AnotherTestFilter string");
+	g_LogSystem->LogDisable("testFilter");
+	g_LogSystem->Logf("testFilter", "I am a testFilter who was written to log");
+	g_LogSystem->LogFlush();
+
+	return true;
+}
+
 
 UNITTEST("TestUnitTest", "TestCategory", 10)
 {

@@ -1,4 +1,0 @@
-Log InitializedLog Entry: Time: 88731.044591Filter: Game
-	 Message: Starting GameLog Entry: Time: 88737.335690Filter: PrintFilter
-	 Message: I am a Logf callLog Entry: Time: 88737.335755Filter: FlushFilter
-	 Message: I am now calling flush

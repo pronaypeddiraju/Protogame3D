@@ -1,0 +1,5 @@
+Log InitializedLog Entry: Time: 174113.158379Filter: Game
+	 Message: Starting GameLog Entry: Time: 174119.588739Filter: testFilter
+	 Message: I am a testFilter StringLog Entry: Time: 174144.932768Filter: testFilter
+	 Message: I am a testFilter who was written to logLog Entry: Time: 174154.406095Filter: AnotherTestFilter
+	 Message: I am a AnotherTestFilter string
