@@ -3,6 +3,7 @@
 //Engine Systems
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Commons/LogSystem.hpp"
+#include "Engine/Commons/Profiler/Profiler.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
 #include "Engine/Core/NamedStrings.hpp"
@@ -61,9 +62,15 @@ void App::StartUp()
 {
 	LoadGameBlackBoard();
 
-	g_LogSystem = new LogSystem(LOG_PATH);
-	g_LogSystem->LogSystemInit();
+#if defined(_DEBUG)
+	{
+		g_LogSystem = new LogSystem(LOG_PATH);
+		g_LogSystem->LogSystemInit();
 
+		gProfiler->ProfilerInitialize();
+	}
+#endif
+	
 	g_eventSystem = new EventSystems();
 
 	//This is now being set in Main_Windows.cpp
@@ -121,10 +128,16 @@ void App::ShutDown()
 	delete g_RNG;
 	g_RNG = nullptr;
 
-	g_LogSystem->LogSystemShutDown();
-	delete g_LogSystem;
-	g_LogSystem = nullptr;
+#if defined(_DEBUG)
+	{
+		g_LogSystem->LogSystemShutDown();
+		delete g_LogSystem;
+		g_LogSystem = nullptr;
 
+		gProfiler->ProfilerShutdown();
+	}
+#endif
+	
 	m_game->Shutdown();
 }
 
@@ -142,6 +155,7 @@ void App::RunFrame()
 
 void App::BeginFrame()
 {
+	gProfiler->ProfilerBeginFrame("App::BeginFrame");
 	g_renderContext->BeginFrame();
 	g_inputSystem->BeginFrame();
 	g_audio->BeginFrame();
@@ -160,10 +174,13 @@ void App::EndFrame()
 	g_eventSystem->EndFrame();
 	g_debugRenderer->EndFrame();
 	g_ImGUI->EndFrame();
+	gProfiler->ProfilerEndFrame();
 }
 
 void App::Update()
 {	
+	gProfiler->ProfilerUpdate();
+
 	m_timeAtLastFrameBegin = m_timeAtThisFrameBegin;
 	m_timeAtThisFrameBegin = GetCurrentTimeSeconds();
 

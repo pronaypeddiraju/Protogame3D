@@ -26,6 +26,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Commons/UnitTest.hpp"
 #include "Engine/Commons/Callstack.hpp"
+#include "Engine/Commons/Profiler/Profiler.hpp"
 #include "Engine/Core/Async/UniformAsyncRingBuffer.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
@@ -892,6 +893,7 @@ void Game::PostRender()
 
 void Game::Update( float deltaTime )
 {
+	PROFILE_FUNCTION();
 
 	UpdateLightPositions();
 

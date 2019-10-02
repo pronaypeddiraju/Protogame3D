@@ -18,3 +18,8 @@
 #elif defined(_RELEASE)
 // #define MEM_TRACKING MEM_TRACK_ALLOC_COUNT
 #endif
+
+#if defined(_DEBUG)
+#define PROFILING_ENABLED
+#elif defined(_RELEASE)
+#endif
