@@ -62,6 +62,11 @@ void App::StartUp()
 {
 	LoadGameBlackBoard();
 
+	g_eventSystem = new EventSystems();
+
+	g_devConsole = new DevConsole();
+	g_devConsole->Startup();
+
 #if defined(_DEBUG)
 	{
 		g_LogSystem = new LogSystem(LOG_PATH);
@@ -70,8 +75,6 @@ void App::StartUp()
 		gProfiler->ProfilerInitialize();
 	}
 #endif
-	
-	g_eventSystem = new EventSystems();
 
 	//This is now being set in Main_Windows.cpp
 	//g_renderContext = new RenderContext(m_appWindowHandle);
@@ -79,9 +82,6 @@ void App::StartUp()
 	g_inputSystem = new InputSystem();
 
 	g_audio = new AudioSystem();
-
-	g_devConsole = new DevConsole();
-	g_devConsole->Startup();
 
 	//create the networking system
 	//g_networkSystem = new NetworkSystem();

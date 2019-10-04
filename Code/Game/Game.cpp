@@ -28,6 +28,7 @@
 #include "Engine/Commons/Callstack.hpp"
 #include "Engine/Commons/Profiler/Profiler.hpp"
 #include "Engine/Core/Async/UniformAsyncRingBuffer.hpp"
+#include "Engine/Commons/Profiler/ProfileLogScope.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -900,8 +901,6 @@ void Game::Update( float deltaTime )
 	//Figure out update state for only move on alt + move
 	UpdateMouseInputs(deltaTime);
 
-	g_ImGUI->BeginFrame();
-
 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
 	{
 		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
@@ -957,9 +956,9 @@ void Game::Update( float deltaTime )
 //------------------------------------------------------------------------------------------------------------------------------
 void Game::UpdateImGUI()
 {
-	//Use this place to create/update info for imGui
-	ImGui::NewFrame();
+	PROFILE_FUNCTION();
 
+	//Use this place to create/update info for imGui
 	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
@@ -1028,6 +1027,9 @@ void Game::LoadGameMaterials()
 
 void Game::UpdateLightPositions()
 {
+	PROFILE_LOG_SCOPE_FUNCTION();
+	PROFILE_FUNCTION();
+
 	//Update all the 4 light positions
 	float currentTime = static_cast<float>(GetCurrentTimeSeconds());
 	DebugRenderOptionsT options;
@@ -1232,6 +1234,8 @@ void Game::GetandSetShaders()
 
 void Game::UpdateMouseInputs(float deltaTime)
 {
+	PROFILE_FUNCTION();
+
 	//Get pitch and yaw from mouse
 	IntVec2 mouseRelativePos = g_windowContext->GetClientMouseRelativeMovement();
 	Vec2 mouse = Vec2((float)mouseRelativePos.x, (float)mouseRelativePos.y);
