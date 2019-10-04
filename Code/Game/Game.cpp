@@ -197,9 +197,9 @@ void Game::SetupMouseData()
 {
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
-	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
+	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
 	
-	g_windowContext->HideMouse();
+	//g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -956,6 +956,11 @@ void Game::Update( float deltaTime )
 //------------------------------------------------------------------------------------------------------------------------------
 void Game::UpdateImGUI()
 {
+	if (gProfiler->GetInstance()->IsProfilerOpen())
+	{
+		return;
+	}
+
 	PROFILE_FUNCTION();
 
 	//Use this place to create/update info for imGui
@@ -1027,7 +1032,6 @@ void Game::LoadGameMaterials()
 
 void Game::UpdateLightPositions()
 {
-	PROFILE_LOG_SCOPE_FUNCTION();
 	PROFILE_FUNCTION();
 
 	//Update all the 4 light positions
