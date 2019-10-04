@@ -538,7 +538,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case A_KEY:
 		{
 			//Handle left movement
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector() * -1.f;
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIBasis() * -1.f;
 			worldMovementDirection *= (m_cameraSpeed);
 
 			m_camPosition += worldMovementDirection; 
@@ -547,7 +547,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case W_KEY:
 		{
 			//Handle forward movement
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector();
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKBasis();
 			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
@@ -556,7 +556,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case S_KEY:
 		{
 			//Handle backward movement
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKVector() * -1.f;
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetKBasis() * -1.f;
 			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
@@ -565,7 +565,7 @@ void Game::HandleKeyPressed(unsigned char keyCode)
 		case D_KEY:
 		{
 			//Handle right movement
-			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIVector();
+			Vec3 worldMovementDirection = m_mainCamera->m_cameraModel.GetIBasis();
 			worldMovementDirection *= (m_cameraSpeed); 
 
 			m_camPosition += worldMovementDirection; 
