@@ -711,6 +711,8 @@ void Game::EnableDirectionalLight( const Vec3& position, const Vec3& direction, 
 
 void Game::Render() const
 {
+	PROFILE_FUNCTION();
+
 	//Get the ColorTargetView from rendercontext
 	ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
 
