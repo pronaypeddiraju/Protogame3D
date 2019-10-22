@@ -6,6 +6,7 @@
 #include "Engine/Commons/Profiler/Profiler.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystems.hpp"
+#include "Engine/Core/JobSystem/JobSystem.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/XMLUtils/XMLUtils.hpp"
@@ -16,6 +17,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 //Game Systems
 #include "Game/Game.hpp"
+#include "Engine/Commons/Profiler/ProfileLogScope.hpp"
 
 App* g_theApp = nullptr;
 
@@ -76,6 +78,8 @@ void App::StartUp()
 	}
 #endif
 
+	gJobSystem = JobSystem::CreateInstance();
+
 	//This is now being set in Main_Windows.cpp
 	//g_renderContext = new RenderContext(m_appWindowHandle);
 	
@@ -128,6 +132,8 @@ void App::ShutDown()
 	delete g_RNG;
 	g_RNG = nullptr;
 
+	JobSystem::DestroyInstance();
+
 #if defined(_DEBUG)
 	{
 		g_LogSystem->LogSystemShutDown();
@@ -156,6 +162,17 @@ void App::RunFrame()
 void App::BeginFrame()
 {
 	gProfiler->ProfilerBeginFrame("App::BeginFrame");
+
+	JobSystem* jobSystem = JobSystem::GetInstance();
+	//Only on the generic threads
+	//jobSystem->ProcessCategoryForTimeInMS(JOB_GENERIC, 5);
+
+	{
+		PROFILE_LOG_SCOPE("Jobs");
+		jobSystem->ProcessCategoryForTimeInMS(JOB_MAIN, 1);
+		jobSystem->ProcessCategoryForTimeInMS(JOB_RENDER, 1);
+	}
+
 	g_renderContext->BeginFrame();
 	g_inputSystem->BeginFrame();
 	g_audio->BeginFrame();
@@ -163,10 +180,16 @@ void App::BeginFrame()
 	g_eventSystem->BeginFrame();
 	g_debugRenderer->BeginFrame();
 	g_ImGUI->BeginFrame();
+
+	m_game->BeginFrame();
 }
 
 void App::EndFrame()
 {
+	JobSystem* jobSystem = JobSystem::GetInstance();
+	jobSystem->ProcessFinishJobsForCategory(JOB_MAIN);
+	jobSystem->ProcessFinishJobsForCategory(JOB_RENDER);
+
 	g_renderContext->EndFrame();
 	g_inputSystem->EndFrame();
 	g_audio->EndFrame();

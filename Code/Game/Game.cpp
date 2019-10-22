@@ -29,6 +29,10 @@
 #include "Engine/Commons/Profiler/Profiler.hpp"
 #include "Engine/Core/Async/UniformAsyncRingBuffer.hpp"
 #include "Engine/Commons/Profiler/ProfileLogScope.hpp"
+#include "Engine/Core/Image.hpp"
+#include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Core/JobSystem/MadleBrotJob.hpp"
+#include "Engine/Core/JobSystem/JobSystem.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -131,6 +135,11 @@ void Game::StartUp()
 
 	CreateInitialLight();
 
+	m_imageMandleBrot = new Image(Rgba::WHITE, 1024, 1024);
+	m_textureMandleBrot = new Texture2D(g_renderContext);
+	m_textureMandleBrot->LoadTextureFromImageDynamic(*m_imageMandleBrot);
+	m_textureViewMandleBrot = m_textureMandleBrot->CreateTextureView2D();
+	
 	UnitTestRunAllCategories(10);
 	//UnitTestRun("TestCategory", 10);
 	//UnitTestRun("AnotherTestCategory", 10);
@@ -141,6 +150,12 @@ void Game::StartUp()
 	DebuggerPrintf("\n Ring Buffer Value: %d", ringBuffer.ReadBuffer());
 	ringBuffer.ResetBuffer();
 	DebuggerPrintf("\n Ring Buffer Value: %d \n", ringBuffer.ReadBuffer());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+void Game::BeginFrame()
+{
+	
 }
 
 UNITTEST("LogFlushTest", "LoggingSystem", 30)
@@ -197,9 +212,9 @@ void Game::SetupMouseData()
 {
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
-	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
+	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
 	
-	//g_windowContext->HideMouse();
+	g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -647,6 +662,12 @@ void Game::Shutdown()
 	delete m_capsule;
 	m_capsule = nullptr;
 
+	delete m_textureViewMandleBrot;
+	m_textureViewMandleBrot = nullptr;
+
+	delete m_textureMandleBrot;
+	m_textureMandleBrot = nullptr;
+
 	//FreeResources();
 }
 
@@ -735,6 +756,7 @@ void Game::Render() const
 	float emissive = Clamp(m_emissiveFactor, 0.1f, 1.f);
 	g_renderContext->m_cpuLightBuffer.emissiveFactor = emissive;
 
+	/*
 	// enable a point light as some position in the world with a normal quadratic falloff; 
 	if(m_enableDirectional)
 	{
@@ -753,8 +775,15 @@ void Game::Render() const
 	{
 		RenderUsingLegacy();
 	}
+	*/
 
-	RenderIsoSprite();
+	TODO("Debug this");
+	g_renderContext->BindShader(m_shader);
+	g_renderContext->BindTextureViewWithSampler(0U, m_textureViewMandleBrot);
+	g_renderContext->SetModelMatrix(m_quadTransfrom);
+	g_renderContext->DrawMesh(m_quad);
+
+	//RenderIsoSprite();
 
 	g_renderContext->EndCamera();
 
@@ -802,8 +831,8 @@ void Game::RenderUsingMaterial() const
 
 	//Render the Quad
 	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	g_renderContext->DrawMesh( m_quad );
+	//g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	//g_renderContext->DrawMesh( m_quad );
 
 	//Render the capsule here
 	g_renderContext->SetModelMatrix(m_capsuleModel);
@@ -834,9 +863,9 @@ void Game::RenderUsingLegacy() const
 	g_renderContext->DrawMesh( m_sphere ); 
 
 	//Render the Quad
-	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	g_renderContext->DrawMesh( m_quad );
+	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	//g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	//g_renderContext->DrawMesh( m_quad );
 
 	//Render the capsule here
 	g_renderContext->SetModelMatrix(m_capsuleModel);
@@ -898,6 +927,8 @@ void Game::Update( float deltaTime )
 {
 	PROFILE_FUNCTION();
 
+	GenerateMandleBrotImage();
+
 	UpdateLightPositions();
 
 	//Figure out update state for only move on alt + move
@@ -942,7 +973,7 @@ void Game::Update( float deltaTime )
 	m_sphereTransform = Matrix44::MakeFromEuler( Vec3(0.0f, -45.0f * currentTime, 0.0f) ); 
 	m_sphereTransform = Matrix44::SetTranslation3D( Vec3(5.0f, 0.0f, 0.0f), m_sphereTransform);
 
-	m_quadTransfrom = Matrix44::SetTranslation3D(Vec3(0.f, 0.f, 0.f), m_quadTransfrom);
+	m_quadTransfrom = Matrix44::SetTranslation3D(Vec3(0.f, 2.f, 0.f), m_quadTransfrom);
 
 	//g_debugRenderer->DebugRenderPoint(Vec3(0.f, 0.f, 0.f), 0.f, 1.f);
 
@@ -1027,6 +1058,38 @@ bool Game::IsAlive()
 	return m_isGameAlive;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
+bool Game::GenerateMandleBrotImage()
+{
+	if (m_imageMandleBrot == nullptr)
+	{
+		return false;
+	}
+
+	IntVec2 imageSize = m_imageMandleBrot->GetImageDimensions();
+
+	// number of iterations to check if item is in set
+	uint MAX_ITERATIONS = 1000;
+
+	for (uint y = 0; y < (uint)imageSize.y; ++y)
+	{
+		//Make the mandleBrot generation job to run the row		
+		MandleBrotJob* mandleBrotJob = new MandleBrotJob(m_imageMandleBrot, y, MAX_ITERATIONS);
+		mandleBrotJob->SetJobCategory(JOB_GENERIC);
+
+		UpdateTextureRowJob* texUpdateJob = new UpdateTextureRowJob(m_imageMandleBrot, m_textureMandleBrot, y);
+		texUpdateJob->SetJobCategory(JOB_RENDER);
+
+		mandleBrotJob->AddSuccessor(texUpdateJob);
+
+		mandleBrotJob->Dispatch();
+		texUpdateJob->Dispatch();
+	}
+
+	return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
 void Game::LoadGameMaterials()
 {
 	m_testMaterial = g_renderContext->CreateOrGetMaterialFromFile(m_materialPath);

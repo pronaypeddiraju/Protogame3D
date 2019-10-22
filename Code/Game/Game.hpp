@@ -13,6 +13,7 @@
 
 //------------------------------------------------------------------------------------------------------------------------------
 class Texture;
+class Texture2D;
 class BitmapFont;
 class TextureView;
 class Image;
@@ -39,6 +40,8 @@ public:
 
 	void								StartUp();
 	
+	void								BeginFrame();
+
 	void								SetupMouseData();
 	void								SetupCameras();
 	void								GetandSetShaders();
@@ -85,7 +88,14 @@ public:
 	void								CheckCollisions();
 
 	bool								IsAlive();
+
+	bool								GenerateMandleBrotImage();
 private:
+
+	Image*								m_imageMandleBrot = nullptr;
+	Texture2D*							m_textureMandleBrot = nullptr;
+	TextureView*						m_textureViewMandleBrot = nullptr;
+
 	bool								m_isGameAlive = false;
 	bool								m_consoleDebugOnce = false;
 	bool								m_devConsoleSetup = false;
