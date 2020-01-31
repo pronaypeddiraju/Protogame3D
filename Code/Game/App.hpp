@@ -3,6 +3,7 @@
 
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Commons/EngineCommon.hpp"
+#include "Engine/Core/PythonScripting/PythonScriptHandler.hpp"
 
 class Game;
 

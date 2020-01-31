@@ -18,6 +18,9 @@
 //Game Systems
 #include "Game/Game.hpp"
 #include "Engine/Commons/Profiler/ProfileLogScope.hpp"
+//Setting up the PVector and PVectorBase to test
+#include "Engine/ProdigyTemplateLibrary/PVectorBase.hpp"
+
 
 App* g_theApp = nullptr;
 
@@ -79,9 +82,6 @@ void App::StartUp()
 #endif
 
 	gJobSystem = JobSystem::CreateInstance();
-
-	//This is now being set in Main_Windows.cpp
-	//g_renderContext = new RenderContext(m_appWindowHandle);
 	
 	g_inputSystem = new InputSystem();
 
@@ -104,6 +104,9 @@ void App::StartUp()
 	m_game->StartUp();
 	
 	g_eventSystem->SubscribeEventCallBackFn("Quit", Command_Quit);
+
+	//Python System startup
+	PythonStartup();
 }
 
 void App::ShutDown()
@@ -132,7 +135,7 @@ void App::ShutDown()
 	delete g_RNG;
 	g_RNG = nullptr;
 
-	JobSystem::DestroyInstance();
+	//JobSystem::DestroyInstance();
 
 #if defined(_DEBUG)
 	{
@@ -168,7 +171,7 @@ void App::BeginFrame()
 	//jobSystem->ProcessCategoryForTimeInMS(JOB_GENERIC, 5);
 
 	{
-		PROFILE_LOG_SCOPE("Jobs");
+		//PROFILE_LOG_SCOPE("Jobs");
 		jobSystem->ProcessCategoryForTimeInMS(JOB_MAIN, 1);
 		jobSystem->ProcessCategoryForTimeInMS(JOB_RENDER, 1);
 	}
@@ -186,9 +189,9 @@ void App::BeginFrame()
 
 void App::EndFrame()
 {
-	JobSystem* jobSystem = JobSystem::GetInstance();
-	jobSystem->ProcessFinishJobsForCategory(JOB_MAIN);
-	jobSystem->ProcessFinishJobsForCategory(JOB_RENDER);
+	//JobSystem* jobSystem = JobSystem::GetInstance();
+	//jobSystem->ProcessFinishJobsForCategory(JOB_MAIN);
+	//jobSystem->ProcessFinishJobsForCategory(JOB_RENDER);
 
 	g_renderContext->EndFrame();
 	g_inputSystem->EndFrame();

@@ -31,8 +31,8 @@
 #include "Engine/Commons/Profiler/ProfileLogScope.hpp"
 #include "Engine/Core/Image.hpp"
 #include "Engine/Renderer/Sampler.hpp"
-#include "Engine/Core/JobSystem/MadleBrotJob.hpp"
-#include "Engine/Core/JobSystem/JobSystem.hpp"
+//#include "Engine/Core/JobSystem/MadleBrotJob.hpp"
+//#include "Engine/Core/JobSystem/JobSystem.hpp"
 
 //#include "ThirdParty/PhysX/include/PxPhysicsAPI.h"
 
@@ -756,7 +756,7 @@ void Game::Render() const
 	float emissive = Clamp(m_emissiveFactor, 0.1f, 1.f);
 	g_renderContext->m_cpuLightBuffer.emissiveFactor = emissive;
 
-	/*
+	
 	// enable a point light as some position in the world with a normal quadratic falloff; 
 	if(m_enableDirectional)
 	{
@@ -775,13 +775,13 @@ void Game::Render() const
 	{
 		RenderUsingLegacy();
 	}
-	*/
+	
 
 	TODO("Debug this");
-	g_renderContext->BindShader(m_shader);
-	g_renderContext->BindTextureViewWithSampler(0U, m_textureViewMandleBrot);
-	g_renderContext->SetModelMatrix(m_quadTransfrom);
-	g_renderContext->DrawMesh(m_quad);
+// 	g_renderContext->BindShader(m_shader);
+// 	g_renderContext->BindTextureViewWithSampler(0U, m_textureViewMandleBrot);
+// 	g_renderContext->SetModelMatrix(m_quadTransfrom);
+// 	g_renderContext->DrawMesh(m_quad);
 
 	//RenderIsoSprite();
 
@@ -810,6 +810,7 @@ void Game::Render() const
 
 	if(g_devConsole->IsOpen())
 	{	
+		g_renderContext->BindShader(m_shader);
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
 
@@ -927,7 +928,7 @@ void Game::Update( float deltaTime )
 {
 	PROFILE_FUNCTION();
 
-	GenerateMandleBrotImage();
+	//GenerateMandleBrotImage();
 
 	UpdateLightPositions();
 
@@ -1071,6 +1072,7 @@ bool Game::GenerateMandleBrotImage()
 	// number of iterations to check if item is in set
 	uint MAX_ITERATIONS = 1000;
 
+	/*
 	for (uint y = 0; y < (uint)imageSize.y; ++y)
 	{
 		//Make the mandleBrot generation job to run the row		
@@ -1085,6 +1087,7 @@ bool Game::GenerateMandleBrotImage()
 		mandleBrotJob->Dispatch();
 		texUpdateJob->Dispatch();
 	}
+	*/
 
 	return true;
 }
