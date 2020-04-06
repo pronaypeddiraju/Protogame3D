@@ -236,9 +236,7 @@ void Game::SetupCameras()
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
 
-	//Setup the UI Camera
-	Vec2 orthoBottomLeft = Vec2(0.f, 0.f);
-	Vec2 orthoTopRight = Vec2(WORLD_WIDTH, WORLD_HEIGHT);
+	//Set ortho view on the UI camera
 	m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
@@ -750,7 +748,6 @@ void Game::Render() const
 	m_mainCamera->SetColorTarget(colorTargetView);
 	m_devConsoleCamera->SetColorTarget(colorTargetView);
 	m_UICamera->SetColorTarget(colorTargetView);
-	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
 
 	// Move the camera to where it is in the scene
 // 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
@@ -959,7 +956,7 @@ void Game::Update( float deltaTime )
 		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 		m_devConsoleSetup = true;
 
-		m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
+		//m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 	}
 
 	//UpdateCamera(deltaTime);
@@ -1212,7 +1209,9 @@ void Game::RenderIsoSprite() const
 //------------------------------------------------------------------------------------------------------------------------------
 void Game::RenderUI() const
 {
+	m_UICamera->SetViewport(Vec2::ZERO, Vec2::ONE);
 	g_renderContext->BeginCamera(*m_UICamera);
+	m_UICamera->UpdateUniformBuffer(g_renderContext);
 	//g_renderContext->BindShader(m_shader);
 	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFont->GetTexture());
 	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
