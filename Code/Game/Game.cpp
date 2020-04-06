@@ -212,9 +212,9 @@ void Game::SetupMouseData()
 {
 	IntVec2 clientCenter = g_windowContext->GetClientCenter();
 	g_windowContext->SetClientMousePosition(clientCenter);
-	g_windowContext->SetMouseMode(MOUSE_MODE_RELATIVE);
+	g_windowContext->SetMouseMode(MOUSE_MODE_ABSOLUTE);
 	
-	g_windowContext->HideMouse();
+	//g_windowContext->HideMouse();
 }
 
 void Game::SetupCameras()
@@ -227,10 +227,19 @@ void Game::SetupCameras()
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget(nullptr);
 
-	//Set Projection Perspective for new Cam
+	//Create a UI Camera
+	m_UICamera = new Camera();
+	m_UICamera->SetColorTarget(nullptr);
+
+	//Set Projection Perspective for main cam
 	m_camPosition = Vec3(0.f, 0.f, -10.f);
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
+
+	//Setup the UI Camera
+	Vec2 orthoBottomLeft = Vec2(0.f, 0.f);
+	Vec2 orthoTopRight = Vec2(WORLD_WIDTH, WORLD_HEIGHT);
+	m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 }
@@ -732,7 +741,7 @@ void Game::EnableDirectionalLight( const Vec3& position, const Vec3& direction, 
 
 void Game::Render() const
 {
-	PROFILE_FUNCTION();
+	gProfiler->ProfilerPush("Game::Render");
 
 	//Get the ColorTargetView from rendercontext
 	ColorTargetView *colorTargetView = g_renderContext->GetFrameColorTarget();
@@ -740,48 +749,51 @@ void Game::Render() const
 	//Setup what we are rendering to
 	m_mainCamera->SetColorTarget(colorTargetView);
 	m_devConsoleCamera->SetColorTarget(colorTargetView);
+	m_UICamera->SetColorTarget(colorTargetView);
+	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
 
 	// Move the camera to where it is in the scene
-	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
-	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
-	m_mainCamera->SetModelMatrix(camTransform);
-
+// 	Matrix44 camTransform = Matrix44::MakeFromEuler( m_mainCamera->GetEuler(), m_rotationOrder ); 
+// 	camTransform = Matrix44::SetTranslation3D(m_camPosition, camTransform);
+// 	m_mainCamera->SetModelMatrix(camTransform);
+// 
 	g_renderContext->BeginCamera(*m_mainCamera); 
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
 	
 	g_renderContext->ClearColorTargets(Rgba(ui_testColor[0], ui_testColor[1], ui_testColor[2], 1.f));
-
-	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
-	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
-
-	float emissive = Clamp(m_emissiveFactor, 0.1f, 1.f);
-	g_renderContext->m_cpuLightBuffer.emissiveFactor = emissive;
+// 
+// 	float intensity = Clamp(m_ambientIntensity, 0.f, 1.f);
+// 	g_renderContext->SetAmbientLight( Rgba::WHITE, intensity ); 
+// 
+// 	float emissive = Clamp(m_emissiveFactor, 0.1f, 1.f);
+// 	g_renderContext->m_cpuLightBuffer.emissiveFactor = emissive;
 
 	
 	// enable a point light as some position in the world with a normal quadratic falloff; 
-	if(m_enableDirectional)
-	{
-		g_renderContext->DisableDirectionalLight();
-	}
-	else 
-	{
-		g_renderContext->EnableDirectionalLight();
-	}
-
-	if(m_useMaterial)
-	{
-		RenderUsingMaterial();
-	}
-	else
-	{
-		RenderUsingLegacy();
-	}
+// 	if(m_enableDirectional)
+// 	{
+// 		g_renderContext->EnableDirectionalLight();
+// 	}
+// 	else 
+// 	{
+// 		g_renderContext->DisableDirectionalLight();
+// 	}
+// 
+// 	if(m_useMaterial)
+// 	{
+// 		RenderUsingMaterial();
+// 	}
+// 	else
+// 	{
+// 		//RenderUsingLegacy();
+// 	}
 	
 
-	TODO("Debug this");
-// 	g_renderContext->BindShader(m_shader);
-// 	g_renderContext->BindTextureViewWithSampler(0U, m_textureViewMandleBrot);
-// 	g_renderContext->SetModelMatrix(m_quadTransfrom);
-// 	g_renderContext->DrawMesh(m_quad);
+// 	TODO("Debug this");
+//  	g_renderContext->BindShader(m_shader);
+//  	g_renderContext->BindTextureViewWithSampler(0U, m_textureViewMandleBrot);
+//  	g_renderContext->SetModelMatrix(m_quadTransfrom);
+//  	g_renderContext->DrawMesh(m_quad);
 
 	//RenderIsoSprite();
 
@@ -793,6 +805,8 @@ void Game::Render() const
 	g_renderContext->SetModelMatrix(m_baseQuadTransform);
 	g_renderContext->DrawMesh( m_baseQuad );	
 	*/
+
+	g_renderContext->BindShader(m_shader);
 
 	if(!m_consoleDebugOnce)
 	{
@@ -814,6 +828,10 @@ void Game::Render() const
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
 
+	RenderUI();
+
+	gProfiler->ProfilerPop();
+
 }
 
 void Game::RenderUsingMaterial() const
@@ -821,19 +839,19 @@ void Game::RenderUsingMaterial() const
 	g_renderContext->BindMaterial(m_testMaterial);
 
 	//Render the cube
-	//g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
+	g_renderContext->BindTextureViewWithSampler(0U, m_boxTexturePath);  
 	g_renderContext->SetModelMatrix(m_cubeTransform);
 	g_renderContext->DrawMesh( m_cube ); 
 
 	//Render the sphere
-	//g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
+	g_renderContext->BindTextureViewWithSampler(0U, m_sphereTexturePath); 
 	g_renderContext->SetModelMatrix( m_sphereTransform ); 
 	g_renderContext->DrawMesh( m_sphere ); 
 
 	//Render the Quad
-	//g_renderContext->BindTextureViewWithSampler(0U, nullptr);
-	//g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
-	//g_renderContext->DrawMesh( m_quad );
+	g_renderContext->BindTextureViewWithSampler(0U, nullptr);
+	g_renderContext->SetModelMatrix(Matrix44::IDENTITY);
+	g_renderContext->DrawMesh( m_quad );
 
 	//Render the capsule here
 	g_renderContext->SetModelMatrix(m_capsuleModel);
@@ -915,17 +933,19 @@ void Game::PostRender()
 		g_debugRenderer->SetClientDimensions( ctv->m_height, ctv->m_width );
 
 		m_isDebugSetup = true;
+
+		SetStartupDebugRenderObjects();
 	}
 
 	//All screen Debug information
-	DebugRenderToScreen();
+	//DebugRenderToScreen();
 
-	g_ImGUI->Render();
+	//g_ImGUI->Render();
 }
 
 void Game::Update( float deltaTime )
 {
-	PROFILE_FUNCTION();
+	gProfiler->ProfilerPush("Game::Update");
 
 	//GenerateMandleBrotImage();
 
@@ -938,6 +958,8 @@ void Game::Update( float deltaTime )
 	{
 		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 		m_devConsoleSetup = true;
+
+		m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
 	}
 
 	//UpdateCamera(deltaTime);
@@ -983,7 +1005,9 @@ void Game::Update( float deltaTime )
 
 	ClearGarbageEntities();	
 
-	UpdateImGUI();
+	//UpdateImGUI();
+
+	gProfiler->ProfilerPop();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
@@ -1066,12 +1090,12 @@ bool Game::GenerateMandleBrotImage()
 		return false;
 	}
 
+	/*
 	IntVec2 imageSize = m_imageMandleBrot->GetImageDimensions();
 
 	// number of iterations to check if item is in set
 	uint MAX_ITERATIONS = 1000;
 
-	/*
 	for (uint y = 0; y < (uint)imageSize.y; ++y)
 	{
 		//Make the mandleBrot generation job to run the row		
@@ -1185,6 +1209,33 @@ void Game::RenderIsoSprite() const
 	g_renderContext->BindTextureView(0U, nullptr);
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
+void Game::RenderUI() const
+{
+	g_renderContext->BeginCamera(*m_UICamera);
+	//g_renderContext->BindShader(m_shader);
+	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFont->GetTexture());
+	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
+
+	Vec2 camMinBounds = m_UICamera->GetOrthoBottomLeft();
+	Vec2 camMaxBounds = m_UICamera->GetOrthoTopRight();
+
+	std::string printString = "Some Text Output";
+	std::vector<Vertex_PCU> textVerts;
+	m_squirrelFont->AddVertsForText2D(textVerts, Vec2::ZERO, m_fontHeight, printString, Rgba::ORANGE);
+
+	std::vector<Vertex_PCU> boxVerts;
+	AddVertsForAABB2D(boxVerts, AABB2(Vec2::ZERO, Vec2(100.f, 100.f)), Rgba::WHITE);
+
+	g_renderContext->DrawVertexArray(textVerts);
+
+	g_renderContext->BindTextureViewWithSampler(0U, m_textureTest);
+	g_renderContext->DrawVertexArray(boxVerts);
+
+	g_renderContext->EndCamera();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
 void Game::CreateInitialLight()
 {
 	EnableDirectionalLight(Vec3(1.f, 1.f, 1.f), Vec3(0.f, 0.f, 1.f));
@@ -1195,6 +1246,7 @@ void Game::CreateInitialLight()
 	EnablePointLight(4U, m_dynamicLight3Pos, Vec3(-1.f, -1.f, 0.f), Rgba::MAGENTA, 1.f, Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, 1.f));
 }
 
+//------------------------------------------------------------------------------------------------------------------------------
 void Game::CreateInitialMeshes()
 {
 

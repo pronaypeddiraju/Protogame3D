@@ -75,6 +75,7 @@ public:
 	void								RenderUsingMaterial() const;
 	void								RenderUsingLegacy() const;
 	void								RenderIsoSprite() const;
+	void								RenderUI() const;
 	void								DebugRenderToScreen() const;
 	void								DebugRenderToCamera() const;
 	void								PostRender();
@@ -126,6 +127,7 @@ public:
 	std::string							m_materialPath = "couch.mat";
 
 	Camera*								m_mainCamera = nullptr;
+	Camera*								m_UICamera = nullptr;
 	Camera*								m_devConsoleCamera = nullptr;
 	Rgba*								m_clearScreenColor = nullptr;
 	
@@ -186,6 +188,7 @@ public:
 	bool								ui_testCheck1 = false;
 	bool								ui_testCheck2 = true;
 
+	float								m_fontHeight = 5.0f;
 
 	//------------------------------------------------------------------------------------------------------------------------------
 	// PhysX Test Variables

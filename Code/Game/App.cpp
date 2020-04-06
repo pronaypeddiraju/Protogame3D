@@ -42,6 +42,8 @@ STATIC bool App::Command_Quit(EventArgs& args)
 
 void App::LoadGameBlackBoard()
 {
+	PROFILE_LOG_SCOPE("App::LoadGameBlackBoard");
+
 	const char* xmlDocPath = "Data/Gameplay/GameConfig.xml";
 	tinyxml2::XMLDocument gameconfig;
 	gameconfig.LoadFile(xmlDocPath);
@@ -65,6 +67,7 @@ void App::LoadGameBlackBoard()
 
 void App::StartUp()
 {
+
 	LoadGameBlackBoard();
 
 	g_eventSystem = new EventSystems();
