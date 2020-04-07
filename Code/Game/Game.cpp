@@ -219,6 +219,9 @@ void Game::SetupMouseData()
 
 void Game::SetupCameras()
 {
+	IntVec2 client = g_windowContext->GetTrueClientBounds();
+	float aspect = (float)client.x / (float)client.y;
+
 	//Create the Camera and setOrthoView
 	m_mainCamera = new Camera();
 	m_mainCamera->SetColorTarget(nullptr);
@@ -236,8 +239,12 @@ void Game::SetupCameras()
 	m_mainCamera->SetColorTarget(nullptr);
 	m_mainCamera->SetPerspectiveProjection( m_camFOVDegrees, 0.1f, 100.0f, SCREEN_ASPECT);
 
-	//Set ortho view on the UI camera
-	m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
+	//Create the world bounds AABB2
+	Vec2 minWorldBounds = Vec2::ZERO;
+	Vec2 maxWorldBounds = Vec2((float)client.x, (float)client.y);
+	
+	m_UICamera->SetOrthoView(minWorldBounds, maxWorldBounds);
+	m_devConsoleCamera->SetOrthoView(minWorldBounds, maxWorldBounds);
 
 	m_clearScreenColor = new Rgba(0.f, 0.f, 0.5f, 1.f);
 }
@@ -819,13 +826,13 @@ void Game::Render() const
 	//Uncomment to get Debug Rendering to work
 	//DebugRenderToCamera();
 
+	RenderUI();
+
 	if(g_devConsole->IsOpen())
 	{	
 		g_renderContext->BindShader(m_shader);
 		g_devConsole->Render(*g_renderContext, *m_devConsoleCamera, DEVCONSOLE_LINE_HEIGHT);
 	}	
-
-	RenderUI();
 
 	gProfiler->ProfilerPop();
 
@@ -951,13 +958,14 @@ void Game::Update( float deltaTime )
 	//Figure out update state for only move on alt + move
 	UpdateMouseInputs(deltaTime);
 
-	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
-	{
-		m_devConsoleCamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
-		m_devConsoleSetup = true;
-
-		//m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
-	}
+// 	if(g_devConsole->GetFrameCount() > 1 && !m_devConsoleSetup)
+// 	{
+// 		m_devConsoleCamera->SetViewport(Vec2::ZERO, Vec2::ONE);
+// 		m_devConsoleCamera->SetOrthoView(Vec2::ZERO, Vec2(WORLD_WIDTH * SCREEN_ASPECT, WORLD_HEIGHT));
+// 		m_devConsoleSetup = true;
+// 
+// 		//m_UICamera->SetOrthoView(Vec2(-WORLD_WIDTH * 0.5f * SCREEN_ASPECT, -WORLD_HEIGHT * 0.5f), Vec2(WORLD_WIDTH * 0.5f * SCREEN_ASPECT, WORLD_HEIGHT * 0.5f));
+// 	}
 
 	//UpdateCamera(deltaTime);
 	g_renderContext->m_frameCount++;

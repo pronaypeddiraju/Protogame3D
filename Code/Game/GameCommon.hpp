@@ -10,7 +10,7 @@ constexpr float SCREEN_ASPECT = 16.f/9.f;
 constexpr float CAMERA_SHAKE_REDUCTION_PER_SECOND = 1.f;
 constexpr float MAX_SHAKE = 2.0f;
 
-constexpr float DEVCONSOLE_LINE_HEIGHT = 2.0f;
+constexpr float DEVCONSOLE_LINE_HEIGHT = 12.0f;
 
 constexpr float CLIENT_ASPECT = 2.0f; // We are requesting a 1:1 aspect (square) window area
 
