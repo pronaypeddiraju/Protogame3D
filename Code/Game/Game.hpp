@@ -113,7 +113,14 @@ public:
 	//All fonts for tests
 	BitmapFont*							m_squirrelFixedFont = nullptr;
 	BitmapFont*							m_squirrelProportionalFont = nullptr;
+	BitmapFont*							m_vineraHandFont = nullptr;
 
+	//Old School fonts
+	BitmapFont*							m_IBM3270Font = nullptr;
+	BitmapFont*							m_apple2Font = nullptr;
+	BitmapFont*							m_commodoreFont = nullptr;
+	BitmapFont*							m_sinclairZXSpectrumFont = nullptr;
+	BitmapFont*							m_atariClassicFont = nullptr;
 
 	Image*								m_testImage = nullptr;
 	float								m_animTime = 0.f;

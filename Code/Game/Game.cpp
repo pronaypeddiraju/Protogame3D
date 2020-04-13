@@ -58,6 +58,14 @@ Game::Game()
 
 	m_squirrelFixedFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
 	m_squirrelProportionalFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelProportionalFont", PROPORTIONAL);
+	m_vineraHandFont = g_renderContext->CreateOrGetBitmapFontFromFile("VineraHand", VARIABLE_WIDTH);
+
+	//Load up classics
+	m_IBM3270Font = g_renderContext->CreateOrGetBitmapFontFromFile("IBM3270", VARIABLE_WIDTH);
+	m_apple2Font = g_renderContext->CreateOrGetBitmapFontFromFile("AppleIIFont", VARIABLE_WIDTH);
+	m_commodoreFont = g_renderContext->CreateOrGetBitmapFontFromFile("CommodorePET1977", VARIABLE_WIDTH);
+	m_sinclairZXSpectrumFont = g_renderContext->CreateOrGetBitmapFontFromFile("ZXSpectrum", VARIABLE_WIDTH);
+	m_atariClassicFont = g_renderContext->CreateOrGetBitmapFontFromFile("AtariClassic", VARIABLE_WIDTH);
 
 	g_devConsole->SetBitmapFont(*m_squirrelFixedFont);
 	g_debugRenderer->SetDebugFont(m_squirrelFixedFont);
@@ -1222,21 +1230,63 @@ void Game::RenderUI() const
 	g_renderContext->BeginCamera(*m_UICamera);
 	m_UICamera->UpdateUniformBuffer(g_renderContext);
 	g_renderContext->BindShader(m_shader);
-	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFixedFont->GetTexture(), SAMPLE_MODE_POINT);
 	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
 
 	Vec2 camMinBounds = m_UICamera->GetOrthoBottomLeft();
 	Vec2 camMaxBounds = m_UICamera->GetOrthoTopRight();
 
-	std::string printString = "iiii Pack my box with five dozen liquor jugs.";
-
+	std::string printString = "AAA iiii ya! '/.,<> ya! Pack my box with five dozen liquor jugs.";
 	std::vector<Vertex_PCU> textVerts;
-	m_squirrelFixedFont->AddVertsForText2D(textVerts, Vec2(10.f, 10.f), m_fontHeight, printString, Rgba::ORANGE);
+	
+	//Retro font tests
+	printString = "The ATARI 400/800 font is from 1979";
+	textVerts.clear();
+	m_atariClassicFont->AddVertsForText2D(textVerts, Vec2(10.f, 410.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_atariClassicFont->GetTexture(), SAMPLE_MODE_POINT);
 	g_renderContext->DrawVertexArray(textVerts);
 
+	printString = "The Apple II font is from 1977";
 	textVerts.clear();
-	m_squirrelProportionalFont->AddVertsForText2D(textVerts, Vec2(10.f, 60.f), m_fontHeight, printString, Rgba::WHITE);
+	m_apple2Font->AddVertsForText2D(textVerts, Vec2(10.f, 360.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_apple2Font->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	printString = "The Commodore 64 font is from 1982";
+	textVerts.clear();
+	m_commodoreFont->AddVertsForText2D(textVerts, Vec2(10.f, 310.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_commodoreFont->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	printString = "The Sinclair ZX Spectrum font is from 1982";
+	textVerts.clear();
+	m_sinclairZXSpectrumFont->AddVertsForText2D(textVerts, Vec2(10.f, 260.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_sinclairZXSpectrumFont->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	printString = "AAA iiii ya! '/.,<> ya! Pack my box with five dozen liquor jugs.";
+
+	//Tier 3 fonts
+	textVerts.clear();
+	m_IBM3270Font->AddVertsForText2D(textVerts, Vec2(10.f, 210.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_IBM3270Font->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	//Tier 3 fonts
+	textVerts.clear();
+	m_vineraHandFont->AddVertsForText2D(textVerts, Vec2(10.f, 160.f), m_fontHeight, printString, Rgba::YELLOW);
+	g_renderContext->BindTextureViewWithSampler(0U, m_vineraHandFont->GetTexture(), SAMPLE_MODE_LINEAR);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	//Tier 2 fonts
+	textVerts.clear();
+	m_squirrelProportionalFont->AddVertsForText2D(textVerts, Vec2(10.f, 80.f), m_fontHeight, printString, Rgba::WHITE);
 	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelProportionalFont->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
+
+	//Tier 1 fonts
+	textVerts.clear();
+	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFixedFont->GetTexture(), SAMPLE_MODE_POINT);
+	m_squirrelFixedFont->AddVertsForText2D(textVerts, Vec2(10.f, 10.f), m_fontHeight, printString, Rgba::ORANGE);
 	g_renderContext->DrawVertexArray(textVerts);
 
 	g_renderContext->EndCamera();
