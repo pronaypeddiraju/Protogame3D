@@ -56,10 +56,11 @@ Game::Game()
 	m_isGameAlive = true;
 	m_testAudioID = g_audio->CreateOrGetSound("Data/Audio/UproarLilWayne.mp3");
 
-	m_squirrelFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
+	m_squirrelFixedFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelFixedFont");
+	m_squirrelProportionalFont = g_renderContext->CreateOrGetBitmapFontFromFile("SquirrelProportionalFont", PROPORTIONAL);
 
-	g_devConsole->SetBitmapFont(*m_squirrelFont);
-	g_debugRenderer->SetDebugFont(m_squirrelFont);
+	g_devConsole->SetBitmapFont(*m_squirrelFixedFont);
+	g_debugRenderer->SetDebugFont(m_squirrelFixedFont);
 }
 
 Game::~Game()
@@ -938,13 +939,13 @@ void Game::PostRender()
 
 		m_isDebugSetup = true;
 
-		SetStartupDebugRenderObjects();
+		//SetStartupDebugRenderObjects();
 	}
 
 	//All screen Debug information
 	//DebugRenderToScreen();
 
-	//g_ImGUI->Render();
+	g_ImGUI->Render();
 }
 
 void Game::Update( float deltaTime )
@@ -1010,7 +1011,7 @@ void Game::Update( float deltaTime )
 
 	ClearGarbageEntities();	
 
-	//UpdateImGUI();
+	UpdateImGUI();
 
 	gProfiler->ProfilerPop();
 }
@@ -1220,24 +1221,23 @@ void Game::RenderUI() const
 	m_UICamera->SetViewport(Vec2::ZERO, Vec2::ONE);
 	g_renderContext->BeginCamera(*m_UICamera);
 	m_UICamera->UpdateUniformBuffer(g_renderContext);
-	//g_renderContext->BindShader(m_shader);
-	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFont->GetTexture());
+	g_renderContext->BindShader(m_shader);
+	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelFixedFont->GetTexture(), SAMPLE_MODE_POINT);
 	m_UICamera->SetModelMatrix(Matrix44::IDENTITY);
 
 	Vec2 camMinBounds = m_UICamera->GetOrthoBottomLeft();
 	Vec2 camMaxBounds = m_UICamera->GetOrthoTopRight();
 
-	std::string printString = "Some Text Output";
+	std::string printString = "iiii Pack my box with five dozen liquor jugs.";
+
 	std::vector<Vertex_PCU> textVerts;
-	m_squirrelFont->AddVertsForText2D(textVerts, Vec2::ZERO, m_fontHeight, printString, Rgba::ORANGE);
-
-	std::vector<Vertex_PCU> boxVerts;
-	AddVertsForAABB2D(boxVerts, AABB2(Vec2::ZERO, Vec2(100.f, 100.f)), Rgba::WHITE);
-
+	m_squirrelFixedFont->AddVertsForText2D(textVerts, Vec2(10.f, 10.f), m_fontHeight, printString, Rgba::ORANGE);
 	g_renderContext->DrawVertexArray(textVerts);
 
-	g_renderContext->BindTextureViewWithSampler(0U, m_textureTest);
-	g_renderContext->DrawVertexArray(boxVerts);
+	textVerts.clear();
+	m_squirrelProportionalFont->AddVertsForText2D(textVerts, Vec2(10.f, 60.f), m_fontHeight, printString, Rgba::WHITE);
+	g_renderContext->BindTextureViewWithSampler(0U, m_squirrelProportionalFont->GetTexture(), SAMPLE_MODE_POINT);
+	g_renderContext->DrawVertexArray(textVerts);
 
 	g_renderContext->EndCamera();
 }

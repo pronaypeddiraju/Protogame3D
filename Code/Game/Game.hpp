@@ -109,7 +109,12 @@ public:
 	TextureView*						m_textureTest = nullptr;
 	TextureView*						m_boxTexture = nullptr;
 	TextureView*						m_sphereTexture = nullptr;
-	BitmapFont*							m_squirrelFont = nullptr;
+	
+	//All fonts for tests
+	BitmapFont*							m_squirrelFixedFont = nullptr;
+	BitmapFont*							m_squirrelProportionalFont = nullptr;
+
+
 	Image*								m_testImage = nullptr;
 	float								m_animTime = 0.f;
 
@@ -188,7 +193,7 @@ public:
 	bool								ui_testCheck1 = false;
 	bool								ui_testCheck2 = true;
 
-	float								m_fontHeight = 5.0f;
+	float								m_fontHeight = 40.0f;
 
 	//------------------------------------------------------------------------------------------------------------------------------
 	// PhysX Test Variables
